@@ -1,0 +1,90 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1774353071108,
+      "tag": "0000_nostalgic_warstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1774353187394,
+      "tag": "0001_minor_sentinel",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1774353260794,
+      "tag": "0002_aspiring_vision",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1774356130970,
+      "tag": "0003_wet_micromax",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1774358196159,
+      "tag": "0004_smiling_venom",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1774360191588,
+      "tag": "0005_dapper_unicorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1742860000000,
+      "tag": "0006_pipeline_strategy",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1742870000000,
+      "tag": "0007_execution_layer",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1774402809806,
+      "tag": "0008_abnormal_bill_hollister",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1774500000000,
+      "tag": "0009_settings_integrations",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1774419934229,
+      "tag": "0010_lazy_ares",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1774421535282,
+      "tag": "0011_tranquil_mister_fear",
+      "breakpoints": true
+    }
+  ]
+}

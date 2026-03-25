@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS `external_research_requests` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`companyId` int NOT NULL,
+	`searchTargets` json NOT NULL,
+	`dataSources` json NOT NULL,
+	`researchGoal` text NOT NULL,
+	`researchGoalAr` text,
+	`frequency` enum('one_time','weekly','monthly') NOT NULL DEFAULT 'one_time',
+	`status` enum('pending_approval','approved','rejected','running','complete','failed') NOT NULL DEFAULT 'pending_approval',
+	`approvedBy` varchar(255),
+	`approvedAt` timestamp,
+	`rejectedBy` varchar(255),
+	`rejectionReason` text,
+	`result` json,
+	`memoryKeysCreated` json,
+	`requestedBy` varchar(255) NOT NULL,
+	`estimatedDataSize` varchar(50),
+	`privacyNote` text,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `external_research_requests_id` PRIMARY KEY(`id`)
+);

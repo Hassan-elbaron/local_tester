@@ -1,0 +1,24 @@
+# ─── Local dev: starts MySQL only ─────────────────────────────────────────────
+# Usage: docker compose up -d
+# Then: pnpm db:push  (applies migrations)
+# Then: pnpm dev      (starts the app on http://localhost:3000)
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ai_marketing_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ai_marketing_os
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  mysql_data:

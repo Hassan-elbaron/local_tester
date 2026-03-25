@@ -1,0 +1,1601 @@
+{
+  "campaign_id": "10cbae97-1a77-433f-b05d-a99731d57069",
+  "context": {
+    "goal": "Launch eco-friendly running shoes with 1000 sales in Q3",
+    "product": "EcoStride Running Shoes",
+    "market": "US Urban Millennials",
+    "budget": 50000.0,
+    "constraints": [
+      "No aggressive sales tactics",
+      "Must highlight recycled materials",
+      "Comply with FTC guidelines"
+    ],
+    "metadata": {}
+  },
+  "tasks": [
+    {
+      "id": "6b0cd11a-d6df-445d-ba2a-cab235ff9ad0",
+      "description": "Market research and competitive analysis",
+      "assigned_role": "research",
+      "status": "completed",
+      "dependencies": [],
+      "inputs": {
+        "agent_role": "research",
+        "task_id": "6b0cd11a-d6df-445d-ba2a-cab235ff9ad0",
+        "context": {
+          "goal": "Launch eco-friendly running shoes with 1000 sales in Q3",
+          "product": "EcoStride Running Shoes",
+          "market": "US Urban Millennials",
+          "budget": 50000.0,
+          "constraints": [
+            "No aggressive sales tactics",
+            "Must highlight recycled materials",
+            "Comply with FTC guidelines"
+          ],
+          "metadata": {}
+        },
+        "dependencies_output": {},
+        "parameters": {}
+      },
+      "output": {
+        "agent": "research",
+        "task_id": "6b0cd11a-d6df-445d-ba2a-cab235ff9ad0",
+        "output": {
+          "competitor_breakdown": {
+            "competitors": [
+              "Competitor A",
+              "Competitor B",
+              "Competitor C"
+            ],
+            "market_share": "15-25% each",
+            "key_differentiators": [
+              "Price",
+              "Quality",
+              "Innovation"
+            ]
+          },
+          "audience_observations": {
+            "primary_segment": "Urban Millennials",
+            "age_range": "25-40",
+            "interests": [
+              "Sustainability",
+              "Innovation",
+              "Quality"
+            ],
+            "pain_points": [
+              "High prices",
+              "Environmental concerns"
+            ]
+          },
+          "market_framing": {
+            "market_size": "$5B",
+            "growth_rate": "8.5% YoY",
+            "market_maturity": "Growth Phase"
+          },
+          "industry_insights": [
+            "Shift towards sustainable products",
+            "Increasing digital adoption",
+            "Rising consumer consciousness"
+          ],
+          "trend_extraction": [
+            "Eco-friendly products gaining traction",
+            "Direct-to-consumer models rising",
+            "Personalization becoming standard"
+          ],
+          "offer_comparisons": {
+            "our_advantage": "Superior quality + sustainability",
+            "price_positioning": "Premium but justified",
+            "unique_value": "Eco-friendly + innovative"
+          },
+          "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u0645\u062d\u0644\u0644 \u0623\u0633\u0648\u0627\u0642 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0633..."
+        },
+        "confidence": 0.85,
+        "metadata": {
+          "model_type": "cloud",
+          "data_sources": [
+            "market_data",
+            "competitor_analysis",
+            "audience_insights"
+          ],
+          "research_depth": "comprehensive",
+          "execution_time_ms": 0.07963180541992188,
+          "agent_execution_count": 1
+        },
+        "timestamp": "2026-03-23 18:08:00.074887"
+      },
+      "error": null,
+      "created_at": "2026-03-23 18:08:00.074685",
+      "completed_at": null
+    },
+    {
+      "id": "08a6c1a3-e124-44b3-bd99-3cf88970a563",
+      "description": "Strategic positioning and messaging",
+      "assigned_role": "strategy",
+      "status": "completed",
+      "dependencies": [],
+      "inputs": {
+        "agent_role": "strategy",
+        "task_id": "08a6c1a3-e124-44b3-bd99-3cf88970a563",
+        "context": {
+          "goal": "Launch eco-friendly running shoes with 1000 sales in Q3",
+          "product": "EcoStride Running Shoes",
+          "market": "US Urban Millennials",
+          "budget": 50000.0,
+          "constraints": [
+            "No aggressive sales tactics",
+            "Must highlight recycled materials",
+            "Comply with FTC guidelines"
+          ],
+          "metadata": {}
+        },
+        "dependencies_output": {
+          "research": {
+            "competitor_breakdown": {
+              "competitors": [
+                "Competitor A",
+                "Competitor B",
+                "Competitor C"
+              ],
+              "market_share": "15-25% each",
+              "key_differentiators": [
+                "Price",
+                "Quality",
+                "Innovation"
+              ]
+            },
+            "audience_observations": {
+              "primary_segment": "Urban Millennials",
+              "age_range": "25-40",
+              "interests": [
+                "Sustainability",
+                "Innovation",
+                "Quality"
+              ],
+              "pain_points": [
+                "High prices",
+                "Environmental concerns"
+              ]
+            },
+            "market_framing": {
+              "market_size": "$5B",
+              "growth_rate": "8.5% YoY",
+              "market_maturity": "Growth Phase"
+            },
+            "industry_insights": [
+              "Shift towards sustainable products",
+              "Increasing digital adoption",
+              "Rising consumer consciousness"
+            ],
+            "trend_extraction": [
+              "Eco-friendly products gaining traction",
+              "Direct-to-consumer models rising",
+              "Personalization becoming standard"
+            ],
+            "offer_comparisons": {
+              "our_advantage": "Superior quality + sustainability",
+              "price_positioning": "Premium but justified",
+              "unique_value": "Eco-friendly + innovative"
+            },
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u0645\u062d\u0644\u0644 \u0623\u0633\u0648\u0627\u0642 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0633..."
+          }
+        },
+        "parameters": {}
+      },
+      "output": {
+        "agent": "strategy",
+        "task_id": "08a6c1a3-e124-44b3-bd99-3cf88970a563",
+        "output": {
+          "segment_definition": "Target Audience Segment",
+          "positioning": "Premium & Innovative",
+          "messaging_pillars": [
+            "Quality & Excellence",
+            "Innovation & Technology",
+            "Customer-Centric Approach"
+          ],
+          "value_proposition": "Delivering superior value through innovation",
+          "go_to_market_strategy": "Multi-channel approach",
+          "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u062e\u0628\u064a\u0631 \u0627\u0633\u062a\u0631\u0627\u062a\u064a\u062c\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n      ..."
+        },
+        "confidence": 0.92,
+        "metadata": {
+          "model_type": "cloud",
+          "prompt_length": 1718,
+          "response_length": 84,
+          "execution_time_ms": 0.07367134094238281,
+          "agent_execution_count": 1
+        },
+        "timestamp": "2026-03-23 18:08:00.075036"
+      },
+      "error": null,
+      "created_at": "2026-03-23 18:08:00.074703",
+      "completed_at": null
+    },
+    {
+      "id": "0d0c7cf2-1227-46aa-ac95-9fc49e5f2bdd",
+      "description": "Content creation",
+      "assigned_role": "content",
+      "status": "completed",
+      "dependencies": [],
+      "inputs": {
+        "agent_role": "content",
+        "task_id": "0d0c7cf2-1227-46aa-ac95-9fc49e5f2bdd",
+        "context": {
+          "goal": "Launch eco-friendly running shoes with 1000 sales in Q3",
+          "product": "EcoStride Running Shoes",
+          "market": "US Urban Millennials",
+          "budget": 50000.0,
+          "constraints": [
+            "No aggressive sales tactics",
+            "Must highlight recycled materials",
+            "Comply with FTC guidelines"
+          ],
+          "metadata": {}
+        },
+        "dependencies_output": {
+          "research": {
+            "competitor_breakdown": {
+              "competitors": [
+                "Competitor A",
+                "Competitor B",
+                "Competitor C"
+              ],
+              "market_share": "15-25% each",
+              "key_differentiators": [
+                "Price",
+                "Quality",
+                "Innovation"
+              ]
+            },
+            "audience_observations": {
+              "primary_segment": "Urban Millennials",
+              "age_range": "25-40",
+              "interests": [
+                "Sustainability",
+                "Innovation",
+                "Quality"
+              ],
+              "pain_points": [
+                "High prices",
+                "Environmental concerns"
+              ]
+            },
+            "market_framing": {
+              "market_size": "$5B",
+              "growth_rate": "8.5% YoY",
+              "market_maturity": "Growth Phase"
+            },
+            "industry_insights": [
+              "Shift towards sustainable products",
+              "Increasing digital adoption",
+              "Rising consumer consciousness"
+            ],
+            "trend_extraction": [
+              "Eco-friendly products gaining traction",
+              "Direct-to-consumer models rising",
+              "Personalization becoming standard"
+            ],
+            "offer_comparisons": {
+              "our_advantage": "Superior quality + sustainability",
+              "price_positioning": "Premium but justified",
+              "unique_value": "Eco-friendly + innovative"
+            },
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u0645\u062d\u0644\u0644 \u0623\u0633\u0648\u0627\u0642 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0633..."
+          },
+          "strategy": {
+            "segment_definition": "Target Audience Segment",
+            "positioning": "Premium & Innovative",
+            "messaging_pillars": [
+              "Quality & Excellence",
+              "Innovation & Technology",
+              "Customer-Centric Approach"
+            ],
+            "value_proposition": "Delivering superior value through innovation",
+            "go_to_market_strategy": "Multi-channel approach",
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u062e\u0628\u064a\u0631 \u0627\u0633\u062a\u0631\u0627\u062a\u064a\u062c\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n      ..."
+          }
+        },
+        "parameters": {}
+      },
+      "output": {
+        "agent": "content",
+        "task_id": "0d0c7cf2-1227-46aa-ac95-9fc49e5f2bdd",
+        "output": {
+          "social_copies": [
+            "Copy 1: Engaging social media post",
+            "Copy 2: Another engaging post",
+            "Copy 3: Call-to-action focused"
+          ],
+          "ad_copies": [
+            "Ad 1: Headline focused",
+            "Ad 2: Benefit focused",
+            "Ad 3: Urgency focused"
+          ],
+          "email_sequences": [
+            "Email 1: Introduction",
+            "Email 2: Value proposition",
+            "Email 3: Call-to-action"
+          ],
+          "hooks_and_ctas": {
+            "hooks": [
+              "Hook 1",
+              "Hook 2"
+            ],
+            "ctas": [
+              "CTA 1",
+              "CTA 2"
+            ]
+          },
+          "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0643\u0627\u062a\u0628 \u0645\u062d\u062a\u0648\u0649 \u062a\u0633\u0648\u064a\u0642\u064a \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648..."
+        },
+        "confidence": 0.88,
+        "metadata": {
+          "model_type": "local",
+          "content_types": [
+            "social",
+            "ads",
+            "email"
+          ],
+          "channels_covered": [
+            "Facebook",
+            "Instagram",
+            "Google"
+          ],
+          "execution_time_ms": 0.03600120544433594,
+          "agent_execution_count": 1
+        },
+        "timestamp": "2026-03-23 18:08:00.075101"
+      },
+      "error": null,
+      "created_at": "2026-03-23 18:08:00.074724",
+      "completed_at": null
+    },
+    {
+      "id": "ccbf5d00-3775-468f-993c-0d61b12db24e",
+      "description": "Campaign planning",
+      "assigned_role": "campaign",
+      "status": "completed",
+      "dependencies": [],
+      "inputs": {
+        "agent_role": "campaign",
+        "task_id": "ccbf5d00-3775-468f-993c-0d61b12db24e",
+        "context": {
+          "goal": "Launch eco-friendly running shoes with 1000 sales in Q3",
+          "product": "EcoStride Running Shoes",
+          "market": "US Urban Millennials",
+          "budget": 50000.0,
+          "constraints": [
+            "No aggressive sales tactics",
+            "Must highlight recycled materials",
+            "Comply with FTC guidelines"
+          ],
+          "metadata": {}
+        },
+        "dependencies_output": {
+          "research": {
+            "competitor_breakdown": {
+              "competitors": [
+                "Competitor A",
+                "Competitor B",
+                "Competitor C"
+              ],
+              "market_share": "15-25% each",
+              "key_differentiators": [
+                "Price",
+                "Quality",
+                "Innovation"
+              ]
+            },
+            "audience_observations": {
+              "primary_segment": "Urban Millennials",
+              "age_range": "25-40",
+              "interests": [
+                "Sustainability",
+                "Innovation",
+                "Quality"
+              ],
+              "pain_points": [
+                "High prices",
+                "Environmental concerns"
+              ]
+            },
+            "market_framing": {
+              "market_size": "$5B",
+              "growth_rate": "8.5% YoY",
+              "market_maturity": "Growth Phase"
+            },
+            "industry_insights": [
+              "Shift towards sustainable products",
+              "Increasing digital adoption",
+              "Rising consumer consciousness"
+            ],
+            "trend_extraction": [
+              "Eco-friendly products gaining traction",
+              "Direct-to-consumer models rising",
+              "Personalization becoming standard"
+            ],
+            "offer_comparisons": {
+              "our_advantage": "Superior quality + sustainability",
+              "price_positioning": "Premium but justified",
+              "unique_value": "Eco-friendly + innovative"
+            },
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u0645\u062d\u0644\u0644 \u0623\u0633\u0648\u0627\u0642 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0633..."
+          },
+          "strategy": {
+            "segment_definition": "Target Audience Segment",
+            "positioning": "Premium & Innovative",
+            "messaging_pillars": [
+              "Quality & Excellence",
+              "Innovation & Technology",
+              "Customer-Centric Approach"
+            ],
+            "value_proposition": "Delivering superior value through innovation",
+            "go_to_market_strategy": "Multi-channel approach",
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u062e\u0628\u064a\u0631 \u0627\u0633\u062a\u0631\u0627\u062a\u064a\u062c\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n      ..."
+          },
+          "content": {
+            "social_copies": [
+              "Copy 1: Engaging social media post",
+              "Copy 2: Another engaging post",
+              "Copy 3: Call-to-action focused"
+            ],
+            "ad_copies": [
+              "Ad 1: Headline focused",
+              "Ad 2: Benefit focused",
+              "Ad 3: Urgency focused"
+            ],
+            "email_sequences": [
+              "Email 1: Introduction",
+              "Email 2: Value proposition",
+              "Email 3: Call-to-action"
+            ],
+            "hooks_and_ctas": {
+              "hooks": [
+                "Hook 1",
+                "Hook 2"
+              ],
+              "ctas": [
+                "CTA 1",
+                "CTA 2"
+              ]
+            },
+            "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0643\u0627\u062a\u0628 \u0645\u062d\u062a\u0648\u0649 \u062a\u0633\u0648\u064a\u0642\u064a \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648..."
+          }
+        },
+        "parameters": {}
+      },
+      "output": {
+        "agent": "campaign",
+        "task_id": "ccbf5d00-3775-468f-993c-0d61b12db24e",
+        "output": {
+          "campaign_structure": {
+            "phases": 3,
+            "phase_1": "Awareness Phase - 2 weeks",
+            "phase_2": "Consideration Phase - 2 weeks",
+            "phase_3": "Conversion Phase - 2 weeks"
+          },
+          "channel_mapping": {
+            "Facebook": "Awareness & Engagement",
+            "Google": "Conversion & Retargeting",
+            "Email": "Nurturing & Retention"
+          },
+          "creative_testing_matrix": {
+            "variations": 3,
+            "test_duration": "1 week",
+            "success_metric": "CTR > 2%"
+          },
+          "launch_sequence": [
+            "Day 1: Facebook awareness campaign",
+            "Day 3: Google search ads",
+            "Day 5: Email nurture sequence"
+          ],
+          "budget_allocation": {
+            "Facebook": 0.5,
+            "Google": 0.35,
+            "Email": 0.15
+          },
+          "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0645\u062e\u0637\u0637 \u062d\u0645\u0644\u0627\u062a \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644..."
+        },
+        "confidence": 0.9,
+        "metadata": {
+          "model_type": "local",
+          "campaign_phases": 3,
+          "channels": [
+            "Facebook",
+            "Google",
+            "Email"
+          ],
+          "execution_time_ms": 0.03409385681152344,
+          "agent_execution_count": 1
+        },
+        "timestamp": "2026-03-23 18:08:00.075177"
+      },
+      "error": null,
+      "created_at": "2026-03-23 18:08:00.074735",
+      "completed_at": null
+    },
+    {
+      "id": "4d75b4b1-7de0-49ae-937e-faca2497ec53",
+      "description": "Budget allocation",
+      "assigned_role": "budget",
+      "status": "completed",
+      "dependencies": [],
+      "inputs": {
+        "agent_role": "budget",
+        "task_id": "4d75b4b1-7de0-49ae-937e-faca2497ec53",
+        "context": {
+          "goal": "Launch eco-friendly running shoes with 1000 sales in Q3",
+          "product": "EcoStride Running Shoes",
+          "market": "US Urban Millennials",
+          "budget": 50000.0,
+          "constraints": [
+            "No aggressive sales tactics",
+            "Must highlight recycled materials",
+            "Comply with FTC guidelines"
+          ],
+          "metadata": {}
+        },
+        "dependencies_output": {
+          "research": {
+            "competitor_breakdown": {
+              "competitors": [
+                "Competitor A",
+                "Competitor B",
+                "Competitor C"
+              ],
+              "market_share": "15-25% each",
+              "key_differentiators": [
+                "Price",
+                "Quality",
+                "Innovation"
+              ]
+            },
+            "audience_observations": {
+              "primary_segment": "Urban Millennials",
+              "age_range": "25-40",
+              "interests": [
+                "Sustainability",
+                "Innovation",
+                "Quality"
+              ],
+              "pain_points": [
+                "High prices",
+                "Environmental concerns"
+              ]
+            },
+            "market_framing": {
+              "market_size": "$5B",
+              "growth_rate": "8.5% YoY",
+              "market_maturity": "Growth Phase"
+            },
+            "industry_insights": [
+              "Shift towards sustainable products",
+              "Increasing digital adoption",
+              "Rising consumer consciousness"
+            ],
+            "trend_extraction": [
+              "Eco-friendly products gaining traction",
+              "Direct-to-consumer models rising",
+              "Personalization becoming standard"
+            ],
+            "offer_comparisons": {
+              "our_advantage": "Superior quality + sustainability",
+              "price_positioning": "Premium but justified",
+              "unique_value": "Eco-friendly + innovative"
+            },
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u0645\u062d\u0644\u0644 \u0623\u0633\u0648\u0627\u0642 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0633..."
+          },
+          "strategy": {
+            "segment_definition": "Target Audience Segment",
+            "positioning": "Premium & Innovative",
+            "messaging_pillars": [
+              "Quality & Excellence",
+              "Innovation & Technology",
+              "Customer-Centric Approach"
+            ],
+            "value_proposition": "Delivering superior value through innovation",
+            "go_to_market_strategy": "Multi-channel approach",
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u062e\u0628\u064a\u0631 \u0627\u0633\u062a\u0631\u0627\u062a\u064a\u062c\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n      ..."
+          },
+          "content": {
+            "social_copies": [
+              "Copy 1: Engaging social media post",
+              "Copy 2: Another engaging post",
+              "Copy 3: Call-to-action focused"
+            ],
+            "ad_copies": [
+              "Ad 1: Headline focused",
+              "Ad 2: Benefit focused",
+              "Ad 3: Urgency focused"
+            ],
+            "email_sequences": [
+              "Email 1: Introduction",
+              "Email 2: Value proposition",
+              "Email 3: Call-to-action"
+            ],
+            "hooks_and_ctas": {
+              "hooks": [
+                "Hook 1",
+                "Hook 2"
+              ],
+              "ctas": [
+                "CTA 1",
+                "CTA 2"
+              ]
+            },
+            "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0643\u0627\u062a\u0628 \u0645\u062d\u062a\u0648\u0649 \u062a\u0633\u0648\u064a\u0642\u064a \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648..."
+          },
+          "campaign": {
+            "campaign_structure": {
+              "phases": 3,
+              "phase_1": "Awareness Phase - 2 weeks",
+              "phase_2": "Consideration Phase - 2 weeks",
+              "phase_3": "Conversion Phase - 2 weeks"
+            },
+            "channel_mapping": {
+              "Facebook": "Awareness & Engagement",
+              "Google": "Conversion & Retargeting",
+              "Email": "Nurturing & Retention"
+            },
+            "creative_testing_matrix": {
+              "variations": 3,
+              "test_duration": "1 week",
+              "success_metric": "CTR > 2%"
+            },
+            "launch_sequence": [
+              "Day 1: Facebook awareness campaign",
+              "Day 3: Google search ads",
+              "Day 5: Email nurture sequence"
+            ],
+            "budget_allocation": {
+              "Facebook": 0.5,
+              "Google": 0.35,
+              "Email": 0.15
+            },
+            "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0645\u062e\u0637\u0637 \u062d\u0645\u0644\u0627\u062a \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644..."
+          }
+        },
+        "parameters": {}
+      },
+      "output": {
+        "agent": "budget",
+        "task_id": "4d75b4b1-7de0-49ae-937e-faca2497ec53",
+        "output": {
+          "allocation": {
+            "Facebook": 25000.0,
+            "Google": 17500.0,
+            "Email": 7500.0
+          },
+          "spend_caps": {
+            "daily": 1666.6666666666667,
+            "weekly": 12500.0
+          },
+          "efficiency_recommendations": [
+            "Focus on high-performing channels",
+            "Optimize bids based on performance",
+            "Allocate budget to best-performing creatives"
+          ],
+          "risk_scenarios": {
+            "best_case": 175000.0,
+            "worst_case": 75000.0,
+            "expected": 140000.0
+          },
+          "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u0645\u064a\u0632\u0627\u0646\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629.\n        \n     ..."
+        },
+        "confidence": 0.91,
+        "metadata": {
+          "model_type": "local",
+          "execution_time_ms": 0.05078315734863281,
+          "agent_execution_count": 1
+        },
+        "timestamp": "2026-03-23 18:08:00.075260"
+      },
+      "error": null,
+      "created_at": "2026-03-23 18:08:00.074744",
+      "completed_at": null
+    },
+    {
+      "id": "a67a9220-47e6-444d-9a99-e7694a5f4040",
+      "description": "Compliance review",
+      "assigned_role": "compliance",
+      "status": "completed",
+      "dependencies": [],
+      "inputs": {
+        "agent_role": "compliance",
+        "task_id": "a67a9220-47e6-444d-9a99-e7694a5f4040",
+        "context": {
+          "goal": "Launch eco-friendly running shoes with 1000 sales in Q3",
+          "product": "EcoStride Running Shoes",
+          "market": "US Urban Millennials",
+          "budget": 50000.0,
+          "constraints": [
+            "No aggressive sales tactics",
+            "Must highlight recycled materials",
+            "Comply with FTC guidelines"
+          ],
+          "metadata": {}
+        },
+        "dependencies_output": {
+          "research": {
+            "competitor_breakdown": {
+              "competitors": [
+                "Competitor A",
+                "Competitor B",
+                "Competitor C"
+              ],
+              "market_share": "15-25% each",
+              "key_differentiators": [
+                "Price",
+                "Quality",
+                "Innovation"
+              ]
+            },
+            "audience_observations": {
+              "primary_segment": "Urban Millennials",
+              "age_range": "25-40",
+              "interests": [
+                "Sustainability",
+                "Innovation",
+                "Quality"
+              ],
+              "pain_points": [
+                "High prices",
+                "Environmental concerns"
+              ]
+            },
+            "market_framing": {
+              "market_size": "$5B",
+              "growth_rate": "8.5% YoY",
+              "market_maturity": "Growth Phase"
+            },
+            "industry_insights": [
+              "Shift towards sustainable products",
+              "Increasing digital adoption",
+              "Rising consumer consciousness"
+            ],
+            "trend_extraction": [
+              "Eco-friendly products gaining traction",
+              "Direct-to-consumer models rising",
+              "Personalization becoming standard"
+            ],
+            "offer_comparisons": {
+              "our_advantage": "Superior quality + sustainability",
+              "price_positioning": "Premium but justified",
+              "unique_value": "Eco-friendly + innovative"
+            },
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u0645\u062d\u0644\u0644 \u0623\u0633\u0648\u0627\u0642 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0633..."
+          },
+          "strategy": {
+            "segment_definition": "Target Audience Segment",
+            "positioning": "Premium & Innovative",
+            "messaging_pillars": [
+              "Quality & Excellence",
+              "Innovation & Technology",
+              "Customer-Centric Approach"
+            ],
+            "value_proposition": "Delivering superior value through innovation",
+            "go_to_market_strategy": "Multi-channel approach",
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u062e\u0628\u064a\u0631 \u0627\u0633\u062a\u0631\u0627\u062a\u064a\u062c\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n      ..."
+          },
+          "content": {
+            "social_copies": [
+              "Copy 1: Engaging social media post",
+              "Copy 2: Another engaging post",
+              "Copy 3: Call-to-action focused"
+            ],
+            "ad_copies": [
+              "Ad 1: Headline focused",
+              "Ad 2: Benefit focused",
+              "Ad 3: Urgency focused"
+            ],
+            "email_sequences": [
+              "Email 1: Introduction",
+              "Email 2: Value proposition",
+              "Email 3: Call-to-action"
+            ],
+            "hooks_and_ctas": {
+              "hooks": [
+                "Hook 1",
+                "Hook 2"
+              ],
+              "ctas": [
+                "CTA 1",
+                "CTA 2"
+              ]
+            },
+            "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0643\u0627\u062a\u0628 \u0645\u062d\u062a\u0648\u0649 \u062a\u0633\u0648\u064a\u0642\u064a \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648..."
+          },
+          "campaign": {
+            "campaign_structure": {
+              "phases": 3,
+              "phase_1": "Awareness Phase - 2 weeks",
+              "phase_2": "Consideration Phase - 2 weeks",
+              "phase_3": "Conversion Phase - 2 weeks"
+            },
+            "channel_mapping": {
+              "Facebook": "Awareness & Engagement",
+              "Google": "Conversion & Retargeting",
+              "Email": "Nurturing & Retention"
+            },
+            "creative_testing_matrix": {
+              "variations": 3,
+              "test_duration": "1 week",
+              "success_metric": "CTR > 2%"
+            },
+            "launch_sequence": [
+              "Day 1: Facebook awareness campaign",
+              "Day 3: Google search ads",
+              "Day 5: Email nurture sequence"
+            ],
+            "budget_allocation": {
+              "Facebook": 0.5,
+              "Google": 0.35,
+              "Email": 0.15
+            },
+            "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0645\u062e\u0637\u0637 \u062d\u0645\u0644\u0627\u062a \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644..."
+          },
+          "budget": {
+            "allocation": {
+              "Facebook": 25000.0,
+              "Google": 17500.0,
+              "Email": 7500.0
+            },
+            "spend_caps": {
+              "daily": 1666.6666666666667,
+              "weekly": 12500.0
+            },
+            "efficiency_recommendations": [
+              "Focus on high-performing channels",
+              "Optimize bids based on performance",
+              "Allocate budget to best-performing creatives"
+            ],
+            "risk_scenarios": {
+              "best_case": 175000.0,
+              "worst_case": 75000.0,
+              "expected": 140000.0
+            },
+            "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u0645\u064a\u0632\u0627\u0646\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629.\n        \n     ..."
+          }
+        },
+        "parameters": {}
+      },
+      "output": {
+        "agent": "compliance",
+        "task_id": "a67a9220-47e6-444d-9a99-e7694a5f4040",
+        "output": {
+          "risk_flags": [],
+          "violations": [],
+          "approved": true,
+          "compliance_score": 0.98,
+          "constraints_verified": {
+            "No aggressive sales tactics": true,
+            "Must highlight recycled materials": true,
+            "Comply with FTC guidelines": true
+          },
+          "recommendations": [
+            "Ensure all claims are substantiated",
+            "Include proper disclaimers",
+            "Verify compliance with platform policies"
+          ],
+          "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u0627\u0645\u062a\u062b\u0627\u0644 \u062a\u0633\u0648\u064a\u0642\u064a.\n        \n       ..."
+        },
+        "confidence": 0.95,
+        "metadata": {
+          "model_type": "local",
+          "execution_time_ms": 0.06270408630371094,
+          "agent_execution_count": 1
+        },
+        "timestamp": "2026-03-23 18:08:00.075349"
+      },
+      "error": null,
+      "created_at": "2026-03-23 18:08:00.074752",
+      "completed_at": null
+    },
+    {
+      "id": "b1eaf93d-ecfe-4a99-8363-3f0e944235f5",
+      "description": "Analytics setup",
+      "assigned_role": "analytics",
+      "status": "completed",
+      "dependencies": [],
+      "inputs": {
+        "agent_role": "analytics",
+        "task_id": "b1eaf93d-ecfe-4a99-8363-3f0e944235f5",
+        "context": {
+          "goal": "Launch eco-friendly running shoes with 1000 sales in Q3",
+          "product": "EcoStride Running Shoes",
+          "market": "US Urban Millennials",
+          "budget": 50000.0,
+          "constraints": [
+            "No aggressive sales tactics",
+            "Must highlight recycled materials",
+            "Comply with FTC guidelines"
+          ],
+          "metadata": {}
+        },
+        "dependencies_output": {
+          "research": {
+            "competitor_breakdown": {
+              "competitors": [
+                "Competitor A",
+                "Competitor B",
+                "Competitor C"
+              ],
+              "market_share": "15-25% each",
+              "key_differentiators": [
+                "Price",
+                "Quality",
+                "Innovation"
+              ]
+            },
+            "audience_observations": {
+              "primary_segment": "Urban Millennials",
+              "age_range": "25-40",
+              "interests": [
+                "Sustainability",
+                "Innovation",
+                "Quality"
+              ],
+              "pain_points": [
+                "High prices",
+                "Environmental concerns"
+              ]
+            },
+            "market_framing": {
+              "market_size": "$5B",
+              "growth_rate": "8.5% YoY",
+              "market_maturity": "Growth Phase"
+            },
+            "industry_insights": [
+              "Shift towards sustainable products",
+              "Increasing digital adoption",
+              "Rising consumer consciousness"
+            ],
+            "trend_extraction": [
+              "Eco-friendly products gaining traction",
+              "Direct-to-consumer models rising",
+              "Personalization becoming standard"
+            ],
+            "offer_comparisons": {
+              "our_advantage": "Superior quality + sustainability",
+              "price_positioning": "Premium but justified",
+              "unique_value": "Eco-friendly + innovative"
+            },
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u0645\u062d\u0644\u0644 \u0623\u0633\u0648\u0627\u0642 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0633..."
+          },
+          "strategy": {
+            "segment_definition": "Target Audience Segment",
+            "positioning": "Premium & Innovative",
+            "messaging_pillars": [
+              "Quality & Excellence",
+              "Innovation & Technology",
+              "Customer-Centric Approach"
+            ],
+            "value_proposition": "Delivering superior value through innovation",
+            "go_to_market_strategy": "Multi-channel approach",
+            "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u062e\u0628\u064a\u0631 \u0627\u0633\u062a\u0631\u0627\u062a\u064a\u062c\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n      ..."
+          },
+          "content": {
+            "social_copies": [
+              "Copy 1: Engaging social media post",
+              "Copy 2: Another engaging post",
+              "Copy 3: Call-to-action focused"
+            ],
+            "ad_copies": [
+              "Ad 1: Headline focused",
+              "Ad 2: Benefit focused",
+              "Ad 3: Urgency focused"
+            ],
+            "email_sequences": [
+              "Email 1: Introduction",
+              "Email 2: Value proposition",
+              "Email 3: Call-to-action"
+            ],
+            "hooks_and_ctas": {
+              "hooks": [
+                "Hook 1",
+                "Hook 2"
+              ],
+              "ctas": [
+                "CTA 1",
+                "CTA 2"
+              ]
+            },
+            "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0643\u0627\u062a\u0628 \u0645\u062d\u062a\u0648\u0649 \u062a\u0633\u0648\u064a\u0642\u064a \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648..."
+          },
+          "campaign": {
+            "campaign_structure": {
+              "phases": 3,
+              "phase_1": "Awareness Phase - 2 weeks",
+              "phase_2": "Consideration Phase - 2 weeks",
+              "phase_3": "Conversion Phase - 2 weeks"
+            },
+            "channel_mapping": {
+              "Facebook": "Awareness & Engagement",
+              "Google": "Conversion & Retargeting",
+              "Email": "Nurturing & Retention"
+            },
+            "creative_testing_matrix": {
+              "variations": 3,
+              "test_duration": "1 week",
+              "success_metric": "CTR > 2%"
+            },
+            "launch_sequence": [
+              "Day 1: Facebook awareness campaign",
+              "Day 3: Google search ads",
+              "Day 5: Email nurture sequence"
+            ],
+            "budget_allocation": {
+              "Facebook": 0.5,
+              "Google": 0.35,
+              "Email": 0.15
+            },
+            "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0645\u062e\u0637\u0637 \u062d\u0645\u0644\u0627\u062a \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644..."
+          },
+          "budget": {
+            "allocation": {
+              "Facebook": 25000.0,
+              "Google": 17500.0,
+              "Email": 7500.0
+            },
+            "spend_caps": {
+              "daily": 1666.6666666666667,
+              "weekly": 12500.0
+            },
+            "efficiency_recommendations": [
+              "Focus on high-performing channels",
+              "Optimize bids based on performance",
+              "Allocate budget to best-performing creatives"
+            ],
+            "risk_scenarios": {
+              "best_case": 175000.0,
+              "worst_case": 75000.0,
+              "expected": 140000.0
+            },
+            "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u0645\u064a\u0632\u0627\u0646\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629.\n        \n     ..."
+          },
+          "compliance": {
+            "risk_flags": [],
+            "violations": [],
+            "approved": true,
+            "compliance_score": 0.98,
+            "constraints_verified": {
+              "No aggressive sales tactics": true,
+              "Must highlight recycled materials": true,
+              "Comply with FTC guidelines": true
+            },
+            "recommendations": [
+              "Ensure all claims are substantiated",
+              "Include proper disclaimers",
+              "Verify compliance with platform policies"
+            ],
+            "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u0627\u0645\u062a\u062b\u0627\u0644 \u062a\u0633\u0648\u064a\u0642\u064a.\n        \n       ..."
+          }
+        },
+        "parameters": {}
+      },
+      "output": {
+        "agent": "analytics",
+        "task_id": "b1eaf93d-ecfe-4a99-8363-3f0e944235f5",
+        "output": {
+          "kpi_framework": [
+            "CPA",
+            "ROAS",
+            "CTR",
+            "Conversion Rate"
+          ],
+          "attribution_model": "Multi-touch Attribution",
+          "reporting_structure": {
+            "daily": "Performance metrics",
+            "weekly": "Trend analysis",
+            "monthly": "Strategic review"
+          },
+          "key_metrics": {
+            "CPA": {
+              "target": 50,
+              "unit": "USD"
+            },
+            "ROAS": {
+              "target": 3.0,
+              "unit": "ratio"
+            },
+            "CTR": {
+              "target": 2.5,
+              "unit": "%"
+            }
+          },
+          "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u062a\u062d\u0644\u064a\u0644\u0627\u062a \u062a\u0633\u0648\u064a\u0642\u064a\u0629.\n        \n     ..."
+        },
+        "confidence": 0.89,
+        "metadata": {
+          "model_type": "local",
+          "execution_time_ms": 0.043392181396484375,
+          "agent_execution_count": 1
+        },
+        "timestamp": "2026-03-23 18:08:00.075422"
+      },
+      "error": null,
+      "created_at": "2026-03-23 18:08:00.074764",
+      "completed_at": null
+    }
+  ],
+  "results": {
+    "research": {
+      "agent": "research",
+      "task_id": "6b0cd11a-d6df-445d-ba2a-cab235ff9ad0",
+      "output": {
+        "competitor_breakdown": {
+          "competitors": [
+            "Competitor A",
+            "Competitor B",
+            "Competitor C"
+          ],
+          "market_share": "15-25% each",
+          "key_differentiators": [
+            "Price",
+            "Quality",
+            "Innovation"
+          ]
+        },
+        "audience_observations": {
+          "primary_segment": "Urban Millennials",
+          "age_range": "25-40",
+          "interests": [
+            "Sustainability",
+            "Innovation",
+            "Quality"
+          ],
+          "pain_points": [
+            "High prices",
+            "Environmental concerns"
+          ]
+        },
+        "market_framing": {
+          "market_size": "$5B",
+          "growth_rate": "8.5% YoY",
+          "market_maturity": "Growth Phase"
+        },
+        "industry_insights": [
+          "Shift towards sustainable products",
+          "Increasing digital adoption",
+          "Rising consumer consciousness"
+        ],
+        "trend_extraction": [
+          "Eco-friendly products gaining traction",
+          "Direct-to-consumer models rising",
+          "Personalization becoming standard"
+        ],
+        "offer_comparisons": {
+          "our_advantage": "Superior quality + sustainability",
+          "price_positioning": "Premium but justified",
+          "unique_value": "Eco-friendly + innovative"
+        },
+        "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u0645\u062d\u0644\u0644 \u0623\u0633\u0648\u0627\u0642 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0633..."
+      },
+      "confidence": 0.85,
+      "metadata": {
+        "model_type": "cloud",
+        "data_sources": [
+          "market_data",
+          "competitor_analysis",
+          "audience_insights"
+        ],
+        "research_depth": "comprehensive",
+        "execution_time_ms": 0.07963180541992188,
+        "agent_execution_count": 1
+      },
+      "timestamp": "2026-03-23 18:08:00.074887"
+    },
+    "strategy": {
+      "agent": "strategy",
+      "task_id": "08a6c1a3-e124-44b3-bd99-3cf88970a563",
+      "output": {
+        "segment_definition": "Target Audience Segment",
+        "positioning": "Premium & Innovative",
+        "messaging_pillars": [
+          "Quality & Excellence",
+          "Innovation & Technology",
+          "Customer-Centric Approach"
+        ],
+        "value_proposition": "Delivering superior value through innovation",
+        "go_to_market_strategy": "Multi-channel approach",
+        "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u062e\u0628\u064a\u0631 \u0627\u0633\u062a\u0631\u0627\u062a\u064a\u062c\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n      ..."
+      },
+      "confidence": 0.92,
+      "metadata": {
+        "model_type": "cloud",
+        "prompt_length": 1718,
+        "response_length": 84,
+        "execution_time_ms": 0.07367134094238281,
+        "agent_execution_count": 1
+      },
+      "timestamp": "2026-03-23 18:08:00.075036"
+    },
+    "content": {
+      "agent": "content",
+      "task_id": "0d0c7cf2-1227-46aa-ac95-9fc49e5f2bdd",
+      "output": {
+        "social_copies": [
+          "Copy 1: Engaging social media post",
+          "Copy 2: Another engaging post",
+          "Copy 3: Call-to-action focused"
+        ],
+        "ad_copies": [
+          "Ad 1: Headline focused",
+          "Ad 2: Benefit focused",
+          "Ad 3: Urgency focused"
+        ],
+        "email_sequences": [
+          "Email 1: Introduction",
+          "Email 2: Value proposition",
+          "Email 3: Call-to-action"
+        ],
+        "hooks_and_ctas": {
+          "hooks": [
+            "Hook 1",
+            "Hook 2"
+          ],
+          "ctas": [
+            "CTA 1",
+            "CTA 2"
+          ]
+        },
+        "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0643\u0627\u062a\u0628 \u0645\u062d\u062a\u0648\u0649 \u062a\u0633\u0648\u064a\u0642\u064a \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648..."
+      },
+      "confidence": 0.88,
+      "metadata": {
+        "model_type": "local",
+        "content_types": [
+          "social",
+          "ads",
+          "email"
+        ],
+        "channels_covered": [
+          "Facebook",
+          "Instagram",
+          "Google"
+        ],
+        "execution_time_ms": 0.03600120544433594,
+        "agent_execution_count": 1
+      },
+      "timestamp": "2026-03-23 18:08:00.075101"
+    },
+    "campaign": {
+      "agent": "campaign",
+      "task_id": "ccbf5d00-3775-468f-993c-0d61b12db24e",
+      "output": {
+        "campaign_structure": {
+          "phases": 3,
+          "phase_1": "Awareness Phase - 2 weeks",
+          "phase_2": "Consideration Phase - 2 weeks",
+          "phase_3": "Conversion Phase - 2 weeks"
+        },
+        "channel_mapping": {
+          "Facebook": "Awareness & Engagement",
+          "Google": "Conversion & Retargeting",
+          "Email": "Nurturing & Retention"
+        },
+        "creative_testing_matrix": {
+          "variations": 3,
+          "test_duration": "1 week",
+          "success_metric": "CTR > 2%"
+        },
+        "launch_sequence": [
+          "Day 1: Facebook awareness campaign",
+          "Day 3: Google search ads",
+          "Day 5: Email nurture sequence"
+        ],
+        "budget_allocation": {
+          "Facebook": 0.5,
+          "Google": 0.35,
+          "Email": 0.15
+        },
+        "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0645\u062e\u0637\u0637 \u062d\u0645\u0644\u0627\u062a \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644..."
+      },
+      "confidence": 0.9,
+      "metadata": {
+        "model_type": "local",
+        "campaign_phases": 3,
+        "channels": [
+          "Facebook",
+          "Google",
+          "Email"
+        ],
+        "execution_time_ms": 0.03409385681152344,
+        "agent_execution_count": 1
+      },
+      "timestamp": "2026-03-23 18:08:00.075177"
+    },
+    "budget": {
+      "agent": "budget",
+      "task_id": "4d75b4b1-7de0-49ae-937e-faca2497ec53",
+      "output": {
+        "allocation": {
+          "Facebook": 25000.0,
+          "Google": 17500.0,
+          "Email": 7500.0
+        },
+        "spend_caps": {
+          "daily": 1666.6666666666667,
+          "weekly": 12500.0
+        },
+        "efficiency_recommendations": [
+          "Focus on high-performing channels",
+          "Optimize bids based on performance",
+          "Allocate budget to best-performing creatives"
+        ],
+        "risk_scenarios": {
+          "best_case": 175000.0,
+          "worst_case": 75000.0,
+          "expected": 140000.0
+        },
+        "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u0645\u064a\u0632\u0627\u0646\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629.\n        \n     ..."
+      },
+      "confidence": 0.91,
+      "metadata": {
+        "model_type": "local",
+        "execution_time_ms": 0.05078315734863281,
+        "agent_execution_count": 1
+      },
+      "timestamp": "2026-03-23 18:08:00.075260"
+    },
+    "compliance": {
+      "agent": "compliance",
+      "task_id": "a67a9220-47e6-444d-9a99-e7694a5f4040",
+      "output": {
+        "risk_flags": [],
+        "violations": [],
+        "approved": true,
+        "compliance_score": 0.98,
+        "constraints_verified": {
+          "No aggressive sales tactics": true,
+          "Must highlight recycled materials": true,
+          "Comply with FTC guidelines": true
+        },
+        "recommendations": [
+          "Ensure all claims are substantiated",
+          "Include proper disclaimers",
+          "Verify compliance with platform policies"
+        ],
+        "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u0627\u0645\u062a\u062b\u0627\u0644 \u062a\u0633\u0648\u064a\u0642\u064a.\n        \n       ..."
+      },
+      "confidence": 0.95,
+      "metadata": {
+        "model_type": "local",
+        "execution_time_ms": 0.06270408630371094,
+        "agent_execution_count": 1
+      },
+      "timestamp": "2026-03-23 18:08:00.075349"
+    },
+    "analytics": {
+      "agent": "analytics",
+      "task_id": "b1eaf93d-ecfe-4a99-8363-3f0e944235f5",
+      "output": {
+        "kpi_framework": [
+          "CPA",
+          "ROAS",
+          "CTR",
+          "Conversion Rate"
+        ],
+        "attribution_model": "Multi-touch Attribution",
+        "reporting_structure": {
+          "daily": "Performance metrics",
+          "weekly": "Trend analysis",
+          "monthly": "Strategic review"
+        },
+        "key_metrics": {
+          "CPA": {
+            "target": 50,
+            "unit": "USD"
+          },
+          "ROAS": {
+            "target": 3.0,
+            "unit": "ratio"
+          },
+          "CTR": {
+            "target": 2.5,
+            "unit": "%"
+          }
+        },
+        "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u062a\u062d\u0644\u064a\u0644\u0627\u062a \u062a\u0633\u0648\u064a\u0642\u064a\u0629.\n        \n     ..."
+      },
+      "confidence": 0.89,
+      "metadata": {
+        "model_type": "local",
+        "execution_time_ms": 0.043392181396484375,
+        "agent_execution_count": 1
+      },
+      "timestamp": "2026-03-23 18:08:00.075422"
+    }
+  },
+  "synthesis": {
+    "research_insights": {
+      "competitor_breakdown": {
+        "competitors": [
+          "Competitor A",
+          "Competitor B",
+          "Competitor C"
+        ],
+        "market_share": "15-25% each",
+        "key_differentiators": [
+          "Price",
+          "Quality",
+          "Innovation"
+        ]
+      },
+      "audience_observations": {
+        "primary_segment": "Urban Millennials",
+        "age_range": "25-40",
+        "interests": [
+          "Sustainability",
+          "Innovation",
+          "Quality"
+        ],
+        "pain_points": [
+          "High prices",
+          "Environmental concerns"
+        ]
+      },
+      "market_framing": {
+        "market_size": "$5B",
+        "growth_rate": "8.5% YoY",
+        "market_maturity": "Growth Phase"
+      },
+      "industry_insights": [
+        "Shift towards sustainable products",
+        "Increasing digital adoption",
+        "Rising consumer consciousness"
+      ],
+      "trend_extraction": [
+        "Eco-friendly products gaining traction",
+        "Direct-to-consumer models rising",
+        "Personalization becoming standard"
+      ],
+      "offer_comparisons": {
+        "our_advantage": "Superior quality + sustainability",
+        "price_positioning": "Premium but justified",
+        "unique_value": "Eco-friendly + innovative"
+      },
+      "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u0645\u062d\u0644\u0644 \u0623\u0633\u0648\u0627\u0642 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0633..."
+    },
+    "strategy": {
+      "segment_definition": "Target Audience Segment",
+      "positioning": "Premium & Innovative",
+      "messaging_pillars": [
+        "Quality & Excellence",
+        "Innovation & Technology",
+        "Customer-Centric Approach"
+      ],
+      "value_proposition": "Delivering superior value through innovation",
+      "go_to_market_strategy": "Multi-channel approach",
+      "raw_response": "[CLOUD: claude-3] Response to: \u0623\u0646\u062a \u062e\u0628\u064a\u0631 \u0627\u0633\u062a\u0631\u0627\u062a\u064a\u062c\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n      ..."
+    },
+    "content_assets": {
+      "social_copies": [
+        "Copy 1: Engaging social media post",
+        "Copy 2: Another engaging post",
+        "Copy 3: Call-to-action focused"
+      ],
+      "ad_copies": [
+        "Ad 1: Headline focused",
+        "Ad 2: Benefit focused",
+        "Ad 3: Urgency focused"
+      ],
+      "email_sequences": [
+        "Email 1: Introduction",
+        "Email 2: Value proposition",
+        "Email 3: Call-to-action"
+      ],
+      "hooks_and_ctas": {
+        "hooks": [
+          "Hook 1",
+          "Hook 2"
+        ],
+        "ctas": [
+          "CTA 1",
+          "CTA 2"
+        ]
+      },
+      "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0643\u0627\u062a\u0628 \u0645\u062d\u062a\u0648\u0649 \u062a\u0633\u0648\u064a\u0642\u064a \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644\u0648..."
+    },
+    "campaign_structure": {
+      "campaign_structure": {
+        "phases": 3,
+        "phase_1": "Awareness Phase - 2 weeks",
+        "phase_2": "Consideration Phase - 2 weeks",
+        "phase_3": "Conversion Phase - 2 weeks"
+      },
+      "channel_mapping": {
+        "Facebook": "Awareness & Engagement",
+        "Google": "Conversion & Retargeting",
+        "Email": "Nurturing & Retention"
+      },
+      "creative_testing_matrix": {
+        "variations": 3,
+        "test_duration": "1 week",
+        "success_metric": "CTR > 2%"
+      },
+      "launch_sequence": [
+        "Day 1: Facebook awareness campaign",
+        "Day 3: Google search ads",
+        "Day 5: Email nurture sequence"
+      ],
+      "budget_allocation": {
+        "Facebook": 0.5,
+        "Google": 0.35,
+        "Email": 0.15
+      },
+      "raw_response": "[LOCAL: neural-chat] Response to: \u0623\u0646\u062a \u0645\u062e\u0637\u0637 \u062d\u0645\u0644\u0627\u062a \u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0645\u062a\u062e\u0635\u0635.\n        \n        \u0645\u0639\u0644..."
+    },
+    "budget_allocation": {
+      "allocation": {
+        "Facebook": 25000.0,
+        "Google": 17500.0,
+        "Email": 7500.0
+      },
+      "spend_caps": {
+        "daily": 1666.6666666666667,
+        "weekly": 12500.0
+      },
+      "efficiency_recommendations": [
+        "Focus on high-performing channels",
+        "Optimize bids based on performance",
+        "Allocate budget to best-performing creatives"
+      ],
+      "risk_scenarios": {
+        "best_case": 175000.0,
+        "worst_case": 75000.0,
+        "expected": 140000.0
+      },
+      "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u0645\u064a\u0632\u0627\u0646\u064a\u0629 \u062a\u0633\u0648\u064a\u0642\u064a\u0629.\n        \n     ..."
+    },
+    "compliance_status": {
+      "risk_flags": [],
+      "violations": [],
+      "approved": true,
+      "compliance_score": 0.98,
+      "constraints_verified": {
+        "No aggressive sales tactics": true,
+        "Must highlight recycled materials": true,
+        "Comply with FTC guidelines": true
+      },
+      "recommendations": [
+        "Ensure all claims are substantiated",
+        "Include proper disclaimers",
+        "Verify compliance with platform policies"
+      ],
+      "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u0627\u0645\u062a\u062b\u0627\u0644 \u062a\u0633\u0648\u064a\u0642\u064a.\n        \n       ..."
+    },
+    "kpi_framework": {
+      "kpi_framework": [
+        "CPA",
+        "ROAS",
+        "CTR",
+        "Conversion Rate"
+      ],
+      "attribution_model": "Multi-touch Attribution",
+      "reporting_structure": {
+        "daily": "Performance metrics",
+        "weekly": "Trend analysis",
+        "monthly": "Strategic review"
+      },
+      "key_metrics": {
+        "CPA": {
+          "target": 50,
+          "unit": "USD"
+        },
+        "ROAS": {
+          "target": 3.0,
+          "unit": "ratio"
+        },
+        "CTR": {
+          "target": 2.5,
+          "unit": "%"
+        }
+      },
+      "raw_response": "[LOCAL: neural-chat] Response to: \n        \u0623\u0646\u062a \u0645\u062a\u062e\u0635\u0635 \u062a\u062d\u0644\u064a\u0644\u0627\u062a \u062a\u0633\u0648\u064a\u0642\u064a\u0629.\n        \n     ..."
+    },
+    "merged_timestamp": "2026-03-23T18:08:00.075468"
+  },
+  "status": "completed",
+  "created_at": "2026-03-23 18:08:00.075496",
+  "completed_at": "2026-03-23 18:08:00.075484"
+}
