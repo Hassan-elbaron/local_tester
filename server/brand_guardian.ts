@@ -183,5 +183,6 @@ export async function generateMentionResponse(companyId: number, mentionId: numb
     ],
   });
 
-  return result.choices[0]?.message?.content ?? "";
+  const raw = result.choices[0]?.message?.content;
+  return typeof raw === "string" ? raw : JSON.stringify(raw) ?? "";
 }

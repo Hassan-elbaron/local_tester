@@ -43,6 +43,38 @@ import {
   approveDeliberation, reviseDeliberation, rejectDeliberation,
   getCompanyDecisions, AGENT_REGISTRY,
 } from "./deliberation_engine";
+import { runSeoAudit, getSeoAudits, getLatestSeoAudit } from "./seo_engine";
+import {
+  getMonitoringSnapshots, getLatestSnapshots, createMonitoringSnapshot,
+  analyzePerformance, getPerformanceTrend,
+} from "./monitoring_service";
+import {
+  getBrandMentions, getUrgentMentions, addBrandMention,
+  scanBrandMentions, analyzeBrandHealth, reviewMention, generateMentionResponse,
+} from "./brand_guardian";
+import {
+  getCustomerIssues, addCustomerIssue, extractCustomerIssuesFromText,
+  generateFaqSuggestions, buildObjectionMap, updateIssueStatus,
+} from "./customer_intelligence";
+import {
+  logWebEvent, upsertSession, getWebEvents, getSessions,
+  getBehaviorInsights, runBehaviorAnalysis, updateInsightStatus,
+} from "./behavior_intelligence";
+import {
+  getPredictions, getActivePredictions, acknowledgePrediction,
+  resolvePrediction, runPredictiveAnalysis, detectContentFatigue,
+} from "./predictive_engine";
+import {
+  getDecisions, getPendingDecisions, approveDecisionItem, rejectDecisionItem,
+  deferDecision, generateDecision, generateDecisionFromPredictions, updateDecisionNotes,
+} from "./decision_engine";
+import {
+  getExternalIdeas, addExternalIdea, reviewIdea, markIdeaImplemented,
+  getSkills, discoverSkill, approveSkill, rejectSkill, markSkillIntegrated, scanForNewSkills,
+} from "./learning_engine";
+import {
+  processCommandMessage, getCommandHistory, saveCommandMessage,
+} from "./command_center";
 import {
   STRATEGY_SECTIONS,
   snapshotStrategy,
@@ -1652,6 +1684,424 @@ const deliberationEngineRouter = router({
   getAgents: publicProcedure.query(() => AGENT_REGISTRY),
 });
 
+// ─── SEO Router ───────────────────────────────────────────────────────────────
+const seoRouter = router({
+  getLatest: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => getLatestSeoAudit(input.companyId)),
+
+  getAll: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => getSeoAudits(input.companyId)),
+
+  runAudit: protectedProcedure
+    .input(z.object({
+      companyId: z.number(),
+      auditType: z.enum(["technical", "on_page", "content", "competitor_gap", "full"]).default("full"),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const result = await runSeoAudit(input.companyId, input.auditType);
+      await createAuditLog({
+        companyId: input.companyId, actor: ctx.user.name ?? "system",
+        action: "seo_audit_run", entityType: "company", entityId: input.companyId,
+        summary: `SEO audit complete: score ${result?.score ?? 0}, ${result?.issues?.length ?? 0} issues found`,
+      });
+      return result;
+    }),
+});
+
+// ─── Monitoring Router ────────────────────────────────────────────────────────
+const monitoringRouter = router({
+  getSnapshots: protectedProcedure
+    .input(z.object({ companyId: z.number(), entityType: z.string().optional() }))
+    .query(({ input }) => getMonitoringSnapshots(input.companyId, input.entityType)),
+
+  getLatest: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => getLatestSnapshots(input.companyId)),
+
+  addSnapshot: protectedProcedure
+    .input(z.object({
+      companyId: z.number(),
+      entityType: z.enum(["campaign", "funnel", "content_item", "website", "social_channel"]),
+      entityId: z.number().optional(),
+      platform: z.string().optional(),
+      metrics: z.record(z.string(), z.union([z.number(), z.string()])),
+    }))
+    .mutation(({ input }) => createMonitoringSnapshot(
+      input.companyId, input.entityType, input.entityId ?? null, input.platform ?? null, input.metrics
+    )),
+
+  analyze: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => analyzePerformance(input.companyId)),
+
+  getTrend: protectedProcedure
+    .input(z.object({ companyId: z.number(), days: z.number().default(30) }))
+    .query(({ input }) => getPerformanceTrend(input.companyId, input.days)),
+});
+
+// ─── Brand Guardian Router ────────────────────────────────────────────────────
+const brandRouter = router({
+  getMentions: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => getBrandMentions(input.companyId)),
+
+  getUrgent: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => getUrgentMentions(input.companyId)),
+
+  addMention: protectedProcedure
+    .input(z.object({
+      companyId: z.number(),
+      source: z.enum(["twitter", "facebook", "instagram", "linkedin", "google_reviews", "trustpilot", "news", "forum", "other"]),
+      content: z.string(),
+      sourceUrl: z.string().optional(),
+      authorName: z.string().optional(),
+    }))
+    .mutation(({ input }) => addBrandMention(input.companyId, input)),
+
+  scan: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const result = await scanBrandMentions(input.companyId);
+      await createAuditLog({
+        companyId: input.companyId, actor: ctx.user.name ?? "system",
+        action: "brand_scan_run", entityType: "company", entityId: input.companyId,
+        summary: `Brand scan: ${result.mentionsGenerated} mentions found, ${result.urgentCount} urgent`,
+      });
+      return result;
+    }),
+
+  analyzeHealth: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => analyzeBrandHealth(input.companyId)),
+
+  review: protectedProcedure
+    .input(z.object({ companyId: z.number(), mentionId: z.number(), notes: z.string().optional() }))
+    .mutation(({ input }) => reviewMention(input.companyId, input.mentionId, input.notes)),
+
+  generateResponse: protectedProcedure
+    .input(z.object({ companyId: z.number(), mentionId: z.number() }))
+    .mutation(({ input }) => generateMentionResponse(input.companyId, input.mentionId)),
+});
+
+// ─── Customer Intelligence Router ─────────────────────────────────────────────
+const customerRouter = router({
+  getIssues: protectedProcedure
+    .input(z.object({ companyId: z.number(), issueType: z.string().optional() }))
+    .query(({ input }) => getCustomerIssues(input.companyId, input.issueType)),
+
+  addIssue: protectedProcedure
+    .input(z.object({
+      companyId: z.number(),
+      issueType: z.enum(["objection", "faq", "complaint", "pre_sale_concern", "post_sale_issue", "support_theme", "feature_request"]),
+      content: z.string(),
+      source: z.string().optional(),
+      priority: z.enum(["high", "medium", "low"]).optional(),
+    }))
+    .mutation(({ input }) => addCustomerIssue(input.companyId, input)),
+
+  extractFromText: protectedProcedure
+    .input(z.object({ companyId: z.number(), text: z.string(), source: z.string() }))
+    .mutation(({ input }) => extractCustomerIssuesFromText(input.companyId, input.text, input.source)),
+
+  generateFaqs: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .mutation(({ input }) => generateFaqSuggestions(input.companyId)),
+
+  buildObjectionMap: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => buildObjectionMap(input.companyId)),
+
+  updateStatus: protectedProcedure
+    .input(z.object({
+      companyId: z.number(), issueId: z.number(),
+      status: z.enum(["open", "addressed", "resolved", "in_faq"]),
+    }))
+    .mutation(({ input }) => updateIssueStatus(input.companyId, input.issueId, input.status)),
+});
+
+// ─── Behavior Intelligence Router ─────────────────────────────────────────────
+const behaviorRouter = router({
+  getInsights: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => getBehaviorInsights(input.companyId)),
+
+  getSessions: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => getSessions(input.companyId)),
+
+  getEvents: protectedProcedure
+    .input(z.object({ companyId: z.number(), page: z.string().optional() }))
+    .query(({ input }) => getWebEvents(input.companyId, input.page)),
+
+  logEvent: protectedProcedure
+    .input(z.object({
+      companyId: z.number(),
+      sessionId: z.string(),
+      eventType: z.enum(["page_view", "click", "scroll", "form_submit", "video_play", "rage_click", "dead_click", "exit", "conversion", "custom"]),
+      page: z.string().optional(),
+      element: z.string().optional(),
+      scrollDepth: z.number().optional(),
+      timeOnPage: z.number().optional(),
+    }))
+    .mutation(({ input }) => logWebEvent(input.companyId, input)),
+
+  analyze: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const result = await runBehaviorAnalysis(input.companyId);
+      await createAuditLog({
+        companyId: input.companyId, actor: ctx.user.name ?? "system",
+        action: "behavior_analysis_run", entityType: "company", entityId: input.companyId,
+        summary: `Behavior analysis: ${result.insightsGenerated} insights, ${result.criticalIssues} critical`,
+      });
+      return result;
+    }),
+
+  updateInsightStatus: protectedProcedure
+    .input(z.object({
+      companyId: z.number(), insightId: z.number(),
+      status: z.enum(["acknowledged", "fixed", "dismissed"]),
+    }))
+    .mutation(({ input }) => updateInsightStatus(input.companyId, input.insightId, input.status)),
+});
+
+// ─── Predictive Engine Router ─────────────────────────────────────────────────
+const predictiveRouter = router({
+  getPredictions: protectedProcedure
+    .input(z.object({ companyId: z.number(), status: z.string().optional() }))
+    .query(({ input }) => getPredictions(input.companyId, input.status)),
+
+  getActive: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => getActivePredictions(input.companyId)),
+
+  runAnalysis: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const result = await runPredictiveAnalysis(input.companyId);
+      await createAuditLog({
+        companyId: input.companyId, actor: ctx.user.name ?? "system",
+        action: "predictive_analysis_run", entityType: "company", entityId: input.companyId,
+        summary: `Predictive analysis: ${result.predictionsGenerated} signals, ${result.criticalCount} critical`,
+      });
+      return result;
+    }),
+
+  acknowledge: protectedProcedure
+    .input(z.object({ companyId: z.number(), predictionId: z.number() }))
+    .mutation(({ input }) => acknowledgePrediction(input.companyId, input.predictionId)),
+
+  resolve: protectedProcedure
+    .input(z.object({ companyId: z.number(), predictionId: z.number() }))
+    .mutation(({ input }) => resolvePrediction(input.companyId, input.predictionId)),
+
+  detectFatigue: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => detectContentFatigue(input.companyId)),
+});
+
+// ─── Decision Engine Router ───────────────────────────────────────────────────
+const decisionRouter = router({
+  getAll: protectedProcedure
+    .input(z.object({ companyId: z.number(), status: z.string().optional() }))
+    .query(({ input }) => getDecisions(input.companyId, input.status)),
+
+  getPending: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(({ input }) => getPendingDecisions(input.companyId)),
+
+  generate: protectedProcedure
+    .input(z.object({
+      companyId: z.number(),
+      situation: z.string(),
+      decisionType: z.enum(["strategy", "campaign", "content", "budget", "channel", "creative", "audience", "seo", "optimization"]),
+      deliberationId: z.number().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const id = await generateDecision(input.companyId, input.situation, input.decisionType, input.deliberationId);
+      await createAuditLog({
+        companyId: input.companyId, actor: ctx.user.name ?? "system",
+        action: "decision_generated", entityType: "decision", entityId: id,
+        summary: `Decision generated: ${input.decisionType} — "${input.situation.substring(0, 60)}"`,
+      });
+      return { id };
+    }),
+
+  generateFromPredictions: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .mutation(async ({ input }) => {
+      const id = await generateDecisionFromPredictions(input.companyId);
+      return { id };
+    }),
+
+  approve: protectedProcedure
+    .input(z.object({ companyId: z.number(), decisionId: z.number(), notes: z.string().optional() }))
+    .mutation(async ({ input, ctx }) => {
+      await approveDecisionItem(input.companyId, input.decisionId, input.notes);
+      await createAuditLog({
+        companyId: input.companyId, actor: ctx.user.name ?? "system",
+        action: "decision_approved", entityType: "decision", entityId: input.decisionId,
+        summary: `Decision #${input.decisionId} approved`,
+      });
+      return { success: true };
+    }),
+
+  reject: protectedProcedure
+    .input(z.object({ companyId: z.number(), decisionId: z.number(), notes: z.string().optional() }))
+    .mutation(async ({ input, ctx }) => {
+      await rejectDecisionItem(input.companyId, input.decisionId, input.notes);
+      await createAuditLog({
+        companyId: input.companyId, actor: ctx.user.name ?? "system",
+        action: "decision_rejected", entityType: "decision", entityId: input.decisionId,
+        summary: `Decision #${input.decisionId} rejected`,
+      });
+      return { success: true };
+    }),
+
+  defer: protectedProcedure
+    .input(z.object({ companyId: z.number(), decisionId: z.number(), notes: z.string().optional() }))
+    .mutation(({ input }) => deferDecision(input.companyId, input.decisionId, input.notes)),
+
+  updateNotes: protectedProcedure
+    .input(z.object({ companyId: z.number(), decisionId: z.number(), notes: z.string() }))
+    .mutation(({ input }) => updateDecisionNotes(input.companyId, input.decisionId, input.notes)),
+});
+
+// ─── Learning Engine Router ───────────────────────────────────────────────────
+const learningRouter = router({
+  // External Ideas
+  getIdeas: protectedProcedure
+    .input(z.object({ companyId: z.number().optional() }))
+    .query(({ input }) => getExternalIdeas(input.companyId)),
+
+  addIdea: protectedProcedure
+    .input(z.object({
+      companyId: z.number().optional(),
+      title: z.string(),
+      sourceUrl: z.string().optional(),
+      sourceType: z.enum(["github_repo", "article", "tool", "workflow", "doc", "example", "plugin", "other"]),
+      rawContent: z.string().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const id = await addExternalIdea({ ...input, addedBy: ctx.user.name ?? ctx.user.openId });
+      return { id };
+    }),
+
+  reviewIdea: protectedProcedure
+    .input(z.object({
+      ideaId: z.number(),
+      decision: z.enum(["approved", "rejected", "deferred"]),
+      companyId: z.number().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      await reviewIdea(input.ideaId, input.decision, input.companyId);
+      await createAuditLog({
+        companyId: input.companyId ?? 0, actor: ctx.user.name ?? "system",
+        action: `idea_${input.decision}`, entityType: "external_idea", entityId: input.ideaId,
+        summary: `External idea #${input.ideaId} ${input.decision}`,
+      });
+      return { success: true };
+    }),
+
+  markImplemented: protectedProcedure
+    .input(z.object({ ideaId: z.number() }))
+    .mutation(({ input }) => markIdeaImplemented(input.ideaId)),
+
+  // Skills Registry
+  getSkills: publicProcedure
+    .input(z.object({ status: z.string().optional() }))
+    .query(({ input }) => getSkills(input.status)),
+
+  discoverSkill: protectedProcedure
+    .input(z.object({
+      name: z.string(),
+      category: z.enum(["seo", "social_listening", "analytics", "content", "crm", "reporting", "ux", "ads", "automation", "other"]),
+      description: z.string().optional(),
+      sourceUrl: z.string().optional(),
+      implementationType: z.enum(["api", "npm_package", "python_tool", "manual", "webhook", "other"]).optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const id = await discoverSkill(input);
+      await createAuditLog({
+        companyId: 0, actor: ctx.user.name ?? "system",
+        action: "skill_discovered", entityType: "skill", entityId: id,
+        summary: `Skill discovered: "${input.name}" (${input.category})`,
+      });
+      return { id };
+    }),
+
+  approveSkill: protectedProcedure
+    .input(z.object({ skillId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      await approveSkill(input.skillId);
+      await createAuditLog({
+        companyId: 0, actor: ctx.user.name ?? "system",
+        action: "skill_approved", entityType: "skill", entityId: input.skillId,
+        summary: `Skill #${input.skillId} approved`,
+      });
+      return { success: true };
+    }),
+
+  rejectSkill: protectedProcedure
+    .input(z.object({ skillId: z.number() }))
+    .mutation(({ input }) => rejectSkill(input.skillId)),
+
+  markSkillIntegrated: protectedProcedure
+    .input(z.object({ skillId: z.number() }))
+    .mutation(({ input }) => markSkillIntegrated(input.skillId)),
+
+  scanForNewSkills: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const count = await scanForNewSkills();
+      await createAuditLog({
+        companyId: 0, actor: ctx.user.name ?? "system",
+        action: "skills_scan_run", entityType: "system", entityId: 0,
+        summary: `Skills scan: ${count} new skills discovered`,
+      });
+      return { count };
+    }),
+});
+
+// ─── Command Center Router ────────────────────────────────────────────────────
+const commandCenterRouter = router({
+  getHistory: protectedProcedure
+    .input(z.object({ companyId: z.number(), limit: z.number().default(50) }))
+    .query(({ input }) => getCommandHistory(input.companyId, input.limit)),
+
+  sendMessage: protectedProcedure
+    .input(z.object({
+      companyId: z.number(),
+      message: z.string().min(1),
+      history: z.array(z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string(),
+      })).default([]),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      // Save user message
+      await saveCommandMessage(input.companyId, "user", input.message);
+
+      // Process
+      const result = await processCommandMessage(
+        input.companyId,
+        input.message,
+        input.history,
+        ctx.user.name ?? ctx.user.openId,
+      );
+
+      // Save assistant reply
+      await saveCommandMessage(input.companyId, "assistant", result.reply, {
+        action: result.action,
+        actionResult: result.actionResult,
+      });
+
+      return result;
+    }),
+});
+
 export const appRouter = router({
   system: systemRouter,
   auth: router({
@@ -1677,6 +2127,15 @@ export const appRouter = router({
   execution: executionRouter,
   settings: settingsRouter,
   deliberationEngine: deliberationEngineRouter,
+  seo: seoRouter,
+  monitoring: monitoringRouter,
+  brand: brandRouter,
+  customer: customerRouter,
+  behavior: behaviorRouter,
+  predictive: predictiveRouter,
+  decisions: decisionRouter,
+  learning: learningRouter,
+  commandCenter: commandCenterRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -50,7 +50,7 @@ export async function createMonitoringSnapshot(
   const alerts: Array<{ type: string; message: string; severity: "info" | "warning" | "critical" }> = [];
 
   if (metrics.ctr !== undefined && Number(metrics.ctr) < 0.01) {
-    alerts.push({ type: "low_ctr", message: `CTR is ${Number(metrics.ctr * 100).toFixed(2)}% — below 1% threshold`, severity: "warning" });
+    alerts.push({ type: "low_ctr", message: `CTR is ${(Number(metrics.ctr) * 100).toFixed(2)}% — below 1% threshold`, severity: "warning" });
   }
   if (metrics.roas !== undefined && Number(metrics.roas) < 1.5) {
     alerts.push({ type: "low_roas", message: `ROAS is ${metrics.roas} — below 1.5x threshold`, severity: "critical" });

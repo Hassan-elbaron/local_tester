@@ -39,18 +39,20 @@ interface AppDef {
 
 const APP_DEFS: AppDef[] = [
   { id: "dashboard", label: "Dashboard", labelAr: "لوحة التحكم", icon: <LayoutDashboard className="w-5 h-5" />, path: "/", color: "from-indigo-500 to-indigo-600", category: "core" },
-  { id: "chat", label: "Control Center", labelAr: "مركز التحكم", icon: <MessageSquare className="w-5 h-5" />, path: "/chat", color: "from-violet-500 to-violet-600", category: "core" },
-  { id: "proposals", label: "Proposals", labelAr: "المقترحات", icon: <FileText className="w-5 h-5" />, path: "/proposals", color: "from-blue-500 to-blue-600", category: "operations" },
-  { id: "approvals", label: "Approvals", labelAr: "الموافقات", icon: <CheckCircle className="w-5 h-5" />, path: "/approvals", color: "from-green-500 to-green-600", category: "operations" },
-  { id: "notifications", label: "Notifications", labelAr: "الإشعارات", icon: <Bell className="w-5 h-5" />, path: "/notifications", color: "from-amber-500 to-amber-600", category: "operations" },
+  { id: "command", label: "Command Center", labelAr: "مركز القيادة", icon: <Brain className="w-5 h-5" />, path: "/command", color: "from-violet-600 to-purple-600", category: "core" },
   { id: "pipeline", label: "Pipeline", labelAr: "خط السير", icon: <Globe className="w-5 h-5" />, path: "/pipeline", color: "from-orange-500 to-orange-600", category: "core" },
   { id: "strategy", label: "Strategy", labelAr: "الاستراتيجية", icon: <Activity className="w-5 h-5" />, path: "/strategy", color: "from-emerald-500 to-emerald-600", category: "core" },
   { id: "execution", label: "Execution", labelAr: "التنفيذ", icon: <Zap className="w-5 h-5" />, path: "/execution", color: "from-amber-500 to-amber-600", category: "core" },
-  { id: "agents", label: "Agents", labelAr: "الوكلاء", icon: <Brain className="w-5 h-5" />, path: "/agents", color: "from-purple-500 to-purple-600", category: "intelligence" },
+  { id: "proposals", label: "Proposals", labelAr: "المقترحات", icon: <FileText className="w-5 h-5" />, path: "/proposals", color: "from-blue-500 to-blue-600", category: "operations" },
+  { id: "approvals", label: "Approvals", labelAr: "الموافقات", icon: <CheckCircle className="w-5 h-5" />, path: "/approvals", color: "from-green-500 to-green-600", category: "operations" },
+  { id: "notifications", label: "Notifications", labelAr: "الإشعارات", icon: <Bell className="w-5 h-5" />, path: "/notifications", color: "from-amber-500 to-amber-600", category: "operations" },
   { id: "intelligence", label: "Intelligence", labelAr: "الذكاء", icon: <Zap className="w-5 h-5" />, path: "/intelligence", color: "from-fuchsia-500 to-fuchsia-600", category: "intelligence" },
+  { id: "learning", label: "Learning", labelAr: "التعلم", icon: <Database className="w-5 h-5" />, path: "/learning", color: "from-teal-500 to-teal-600", category: "intelligence" },
+  { id: "skills", label: "Skills Hub", labelAr: "مركز المهارات", icon: <Shield className="w-5 h-5" />, path: "/skills", color: "from-purple-500 to-purple-600", category: "intelligence" },
+  { id: "agents", label: "Agents", labelAr: "الوكلاء", icon: <BarChart3 className="w-5 h-5" />, path: "/agents", color: "from-indigo-500 to-indigo-600", category: "intelligence" },
   { id: "audit", label: "Audit Log", labelAr: "سجل المراجعة", icon: <ScrollText className="w-5 h-5" />, path: "/audit", color: "from-slate-500 to-slate-600", category: "intelligence" },
-  { id: "expansion", label: "Expansion Center", labelAr: "مركز التوسع", icon: <Shield className="w-5 h-5" />, path: "/expansion", color: "from-violet-500 to-violet-600", category: "intelligence" },
   { id: "companies", label: "Companies", labelAr: "الشركات", icon: <Building2 className="w-5 h-5" />, path: "/companies", color: "from-teal-500 to-teal-600", category: "settings" },
+  { id: "expansion", label: "Expansion", labelAr: "مركز التوسع", icon: <Globe className="w-5 h-5" />, path: "/expansion", color: "from-violet-500 to-violet-600", category: "settings" },
   { id: "settings", label: "Settings", labelAr: "الإعدادات", icon: <Settings className="w-5 h-5" />, path: "/settings", color: "from-slate-500 to-slate-600", category: "settings" },
 ];
 

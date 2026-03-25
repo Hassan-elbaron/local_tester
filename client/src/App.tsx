@@ -23,6 +23,9 @@ import Pipeline from "./pages/Pipeline";
 import Strategy from "./pages/Strategy";
 import Execution from "./pages/Execution";
 import Settings from "./pages/Settings";
+import CommandCenter from "./pages/CommandCenter";
+import LearningPage from "./pages/LearningPage";
+import SkillsHub from "./pages/SkillsHub";
 import { getLoginUrl } from "./const";
 import { Button } from "@/components/ui/button";
 import { Brain, Loader2 } from "lucide-react";
@@ -94,6 +97,9 @@ function Router() {
       <Route path="/execution" component={Execution} />
       <Route path="/companies" component={Companies} />
       <Route path="/settings" component={Settings} />
+      <Route path="/command" component={CommandCenter} />
+      <Route path="/learning" component={LearningPage} />
+      <Route path="/skills" component={SkillsHub} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -81,7 +81,7 @@ export async function runPredictiveAnalysis(companyId: number): Promise<{
     total: content.length,
     approved: content.filter(c => c.copyStatus === "approved").length,
     published: content.filter(c => c.copyStatus === "published").length,
-    platforms: [...new Set(content.map(c => c.platform).filter(Boolean))],
+    platforms: Array.from(new Set(content.map(c => c.platform).filter(Boolean))),
   };
 
   const result = await invokeLLM({
