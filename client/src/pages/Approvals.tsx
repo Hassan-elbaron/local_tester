@@ -22,12 +22,12 @@ export default function Approvals() {
   );
 
   const approve = trpc.approvals.approve.useMutation({
-    onSuccess: () => { toast.success("Approved! ✓"); utils.approvals.list.invalidate(); utils.approvals.pending.invalidate(); },
+    onSuccess: () => { toast.success(t("general.success")); utils.approvals.list.invalidate(); utils.approvals.pending.invalidate(); },
     onError: (err) => toast.error(err.message),
   });
 
   const reject = trpc.approvals.reject.useMutation({
-    onSuccess: () => { toast.success("Rejected."); utils.approvals.list.invalidate(); utils.approvals.pending.invalidate(); setRejectId(null); setRejectReason(""); },
+    onSuccess: () => { toast.success(t("approval.reject")); utils.approvals.list.invalidate(); utils.approvals.pending.invalidate(); setRejectId(null); setRejectReason(""); },
     onError: (err) => toast.error(err.message),
   });
 
@@ -45,7 +45,7 @@ export default function Approvals() {
       <div>
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
           <Clock className="w-4 h-4 text-orange-400" />
-          Pending Approval ({pending.length})
+          {t("approval.pending")} ({pending.length})
         </h2>
         {isLoading ? (
           <div className="flex items-center justify-center h-24"><Loader2 className="w-5 h-5 animate-spin text-indigo-400" /></div>
@@ -53,7 +53,7 @@ export default function Approvals() {
           <Card className="bg-card border-border">
             <CardContent className="p-8 text-center">
               <CheckCircle className="w-10 h-10 text-green-400/30 mx-auto mb-3" />
-              <p className="text-muted-foreground text-sm">No pending approvals — all clear!</p>
+              <p className="text-muted-foreground text-sm">{t("approval.noPending")}</p>
             </CardContent>
           </Card>
         ) : (
@@ -73,10 +73,10 @@ export default function Approvals() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Button size="sm" onClick={() => approve.mutate({ approvalId: p.id, companyId })} disabled={approve.isPending} className="bg-green-600 hover:bg-green-700 h-8 text-xs">
-                        <CheckCircle className="w-3.5 h-3.5 mr-1" />{t("approval.approve")}
+                        <CheckCircle className="w-3.5 h-3.5 me-1" />{t("approval.approve")}
                       </Button>
                       <Button size="sm" onClick={() => setRejectId(rejectId === p.id ? null : p.id)} disabled={reject.isPending} variant="destructive" className="h-8 text-xs">
-                        <XCircle className="w-3.5 h-3.5 mr-1" />{t("approval.reject")}
+                        <XCircle className="w-3.5 h-3.5 me-1" />{t("approval.reject")}
                       </Button>
                       <Link href={`/proposals/${p.proposalId}`}>
                         <Button size="sm" variant="ghost" className="h-8 text-xs"><ArrowRight className="w-3.5 h-3.5" /></Button>
@@ -85,9 +85,9 @@ export default function Approvals() {
                   </div>
                   {rejectId === p.id && (
                     <div className="space-y-2 pt-2">
-                      <textarea className="w-full bg-background border border-border rounded-lg p-2 text-sm resize-none" rows={2} placeholder="Reason for rejection (required)..." value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} />
+                      <textarea className="w-full bg-background border border-border rounded-lg p-2 text-sm resize-none" rows={2} placeholder={t("approval.reasonPlaceholder")} value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} />
                       <Button size="sm" variant="destructive" disabled={!rejectReason.trim() || reject.isPending} onClick={() => reject.mutate({ approvalId: p.id, companyId, reason: rejectReason })} className="h-7 text-xs">
-                        {reject.isPending ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null} Confirm Rejection
+                        {reject.isPending ? <Loader2 className="w-3 h-3 animate-spin me-1" /> : null} {t("approval.confirmRejection")}
                       </Button>
                     </div>
                   )}
@@ -101,7 +101,7 @@ export default function Approvals() {
       {/* Decided */}
       {decided.length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">History ({decided.length})</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{t("approval.history")} ({decided.length})</h2>
           <div className="grid gap-2">
             {decided.map((p) => (
               <Link key={p.id} href={`/proposals/${p.proposalId}`}>
@@ -113,7 +113,7 @@ export default function Approvals() {
                         <span className="text-xs text-muted-foreground">{p.proposalType ?? "—"}</span>
                       </div>
                       <Badge className={`text-xs ${p.status === "approved" ? "bg-green-500/20 text-green-400" : p.status === "rejected" ? "bg-red-500/20 text-red-400" : "bg-blue-500/20 text-blue-400"}`}>
-                        {p.status}
+                        {t(`proposal.status.${p.status}`)}
                       </Badge>
                     </div>
                   </CardContent>

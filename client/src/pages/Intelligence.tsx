@@ -21,7 +21,7 @@ import {
 
 export default function Intelligence() {
   const { currentCompany: selectedCompany } = useCompany();
-  const { t, lang: language } = useI18n();
+  const { t } = useI18n();
   const companyId = selectedCompany?.id ?? 0;
   const [selectedLearnings, setSelectedLearnings] = useState<number[]>([]);
   const [showResultForm, setShowResultForm] = useState(false);
@@ -50,23 +50,23 @@ export default function Intelligence() {
   const proposals = proposalsData ?? [];
 
   const approveRuleMut = trpc.intelligence.approveRule.useMutation({
-    onSuccess: () => { toast.success("Rule approved and activated"); refetchRules(); },
+    onSuccess: () => { toast.success(t("general.success")); refetchRules(); },
   });
   const rejectRuleMut = trpc.intelligence.rejectRule.useMutation({
-    onSuccess: () => { toast.success("Rule rejected and removed"); refetchRules(); },
+    onSuccess: () => { toast.success(t("general.success")); refetchRules(); },
   });
   const generateRuleMut = trpc.intelligence.generateRule.useMutation({
-    onSuccess: () => { toast.success("Rule generated — review and approve to activate"); refetchRules(); setSelectedLearnings([]); },
+    onSuccess: () => { toast.success(t("general.success")); refetchRules(); setSelectedLearnings([]); },
   });
   const discoverPatternsMut = trpc.intelligence.discoverPatterns.useMutation({
     onSuccess: (data) => {
-      if (data.length) toast.success(`${data.length} patterns discovered`);
-      else toast.info("No new patterns found yet — add more data first");
+      if (data.length) toast.success(`${data.length} ${t("general.success")}`);
+      else toast.info(t("general.noData"));
     },
   });
   const saveCampaignResultMut = trpc.intelligence.saveCampaignResult.useMutation({
     onSuccess: () => {
-      toast.success("Results saved — learning extracted automatically");
+      toast.success(t("general.success"));
       refetchResults(); refetchLearnings(); setShowResultForm(false);
       setResultForm({ proposalId: "", actualRoas: "", actualCpa: "", actualSpend: "", actualRevenue: "", actualConversions: "", notes: "", performanceVsPrediction: "" });
     },
@@ -92,7 +92,7 @@ export default function Intelligence() {
       <div className="flex items-center justify-center h-full text-muted-foreground">
         <div className="text-center">
           <Brain className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p>Select a company to view intelligence</p>
+          <p>{t("intelligence.noCompany")}</p>
         </div>
       </div>
     );
@@ -105,12 +105,10 @@ export default function Intelligence() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Brain className="w-7 h-7 text-purple-400" />
-            {language === "ar" ? "مركز الذكاء" : "Intelligence Center"}
+            {t("intelligence.title")}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {language === "ar"
-              ? "نظام التعلم المستمر — كل قرار يُحوَّل إلى معرفة"
-              : "Continuous learning system — every decision becomes knowledge"}
+            {t("intelligence.subtitleAlt")}
           </p>
         </div>
         <div className="flex gap-2">
@@ -120,12 +118,12 @@ export default function Intelligence() {
             onClick={() => discoverPatternsMut.mutate({ companyId })}
             disabled={discoverPatternsMut.isPending}
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${discoverPatternsMut.isPending ? "animate-spin" : ""}`} />
-            {language === "ar" ? "اكتشاف أنماط" : "Discover Patterns"}
+            <RefreshCw className={`w-4 h-4 me-2 ${discoverPatternsMut.isPending ? "animate-spin" : ""}`} />
+            {t("intelligence.discoverPatterns")}
           </Button>
           <Button size="sm" onClick={() => setShowResultForm(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            {language === "ar" ? "إضافة نتائج" : "Add Results"}
+            <Plus className="w-4 h-4 me-2" />
+            {t("intelligence.addResults")}
           </Button>
         </div>
       </div>
@@ -136,7 +134,7 @@ export default function Intelligence() {
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2 mb-1">
               <BookOpen className="w-4 h-4 text-blue-400" />
-              <span className="text-xs text-muted-foreground">{language === "ar" ? "التعلمات" : "Learnings"}</span>
+              <span className="text-xs text-muted-foreground">{t("intelligence.learnings")}</span>
             </div>
             <p className="text-2xl font-bold">{(learnings as any[]).length}</p>
           </CardContent>
@@ -145,7 +143,7 @@ export default function Intelligence() {
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2 mb-1">
               <Shield className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-muted-foreground">{language === "ar" ? "قواعد نشطة" : "Active Rules"}</span>
+              <span className="text-xs text-muted-foreground">{t("intelligence.activeRules")}</span>
             </div>
             <p className="text-2xl font-bold">{activeRules.length}</p>
           </CardContent>
@@ -154,7 +152,7 @@ export default function Intelligence() {
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2 mb-1">
               <Clock className="w-4 h-4 text-amber-400" />
-              <span className="text-xs text-muted-foreground">{language === "ar" ? "تنتظر موافقة" : "Pending Approval"}</span>
+              <span className="text-xs text-muted-foreground">{t("intelligence.pendingApproval")}</span>
             </div>
             <p className="text-2xl font-bold">{pendingRules.length}</p>
           </CardContent>
@@ -163,7 +161,7 @@ export default function Intelligence() {
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2 mb-1">
               <Activity className="w-4 h-4 text-purple-400" />
-              <span className="text-xs text-muted-foreground">{language === "ar" ? "نتائج حملات" : "Campaign Results"}</span>
+              <span className="text-xs text-muted-foreground">{t("intelligence.campaignResults")}</span>
             </div>
             <p className="text-2xl font-bold">{(campaignResults as any[]).length}</p>
           </CardContent>
@@ -175,25 +173,25 @@ export default function Intelligence() {
         <TabsList className="bg-card/50 border border-border/50">
           <TabsTrigger value="learnings" className="gap-1.5">
             <BookOpen className="w-3.5 h-3.5" />
-            {language === "ar" ? "التعلمات" : "Learnings"}
+            {t("intelligence.tabs.learnings")}
             {(learnings as any[]).length > 0 && (
               <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4">{(learnings as any[]).length}</Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="rules" className="gap-1.5">
             <Shield className="w-3.5 h-3.5" />
-            {language === "ar" ? "القواعد" : "Rules"}
+            {t("intelligence.tabs.rules")}
             {pendingRules.length > 0 && (
               <Badge variant="destructive" className="text-xs px-1.5 py-0 h-4">{pendingRules.length}</Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="results" className="gap-1.5">
             <BarChart3 className="w-3.5 h-3.5" />
-            {language === "ar" ? "نتائج الحملات" : "Campaign Results"}
+            {t("intelligence.tabs.campaigns")}
           </TabsTrigger>
           <TabsTrigger value="governance" className="gap-1.5">
             <Lock className="w-3.5 h-3.5" />
-            {language === "ar" ? "الحوكمة" : "Governance"}
+            {t("intelligence.tabs.governance")}
           </TabsTrigger>
         </TabsList>
 
@@ -203,12 +201,8 @@ export default function Intelligence() {
             <Card className="bg-card/50 border-border/50">
               <CardContent className="py-12 text-center text-muted-foreground">
                 <Brain className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                <p className="font-medium">{language === "ar" ? "لا توجد تعلمات بعد" : "No learnings yet"}</p>
-                <p className="text-sm mt-1">
-                  {language === "ar"
-                    ? "ستظهر التعلمات تلقائياً عند الموافقة على proposals أو رفضها أو إدخال نتائج الحملات"
-                    : "Learnings appear automatically when proposals are approved, rejected, or campaign results are entered"}
-                </p>
+                <p className="font-medium">{t("intelligence.noLearnings")}</p>
+                <p className="text-sm mt-1">{t("intelligence.noLearningsDesc")}</p>
               </CardContent>
             </Card>
           ) : (
@@ -217,16 +211,16 @@ export default function Intelligence() {
                 <div className="flex items-center gap-3 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
                   <Lightbulb className="w-4 h-4 text-purple-400 shrink-0" />
                   <span className="text-sm text-purple-300">
-                    {selectedLearnings.length} {language === "ar" ? "تعلمات محددة" : "learnings selected"}
+                    {selectedLearnings.length} {t("intelligence.learningsSelected")}
                   </span>
                   <Button
                     size="sm"
-                    className="ml-auto"
+                    className="ms-auto"
                     onClick={() => generateRuleMut.mutate({ companyId, learningIds: selectedLearnings })}
                     disabled={generateRuleMut.isPending}
                   >
-                    <Zap className="w-3.5 h-3.5 mr-1.5" />
-                    {language === "ar" ? "توليد قاعدة" : "Generate Rule"}
+                    <Zap className="w-3.5 h-3.5 me-1.5" />
+                    {t("intelligence.generateRule")}
                   </Button>
                 </div>
               )}
@@ -254,8 +248,8 @@ export default function Intelligence() {
                             <Badge variant="outline" className="text-xs">
                               {learning.eventType?.replace(/_/g, " ")}
                             </Badge>
-                            <span className="text-xs text-muted-foreground ml-auto">
-                              {Math.round(parseFloat(learning.confidence ?? "0.7") * 100)}% confidence
+                            <span className="text-xs text-muted-foreground ms-auto">
+                              {Math.round(parseFloat(learning.confidence ?? "0.7") * 100)}% {t("intelligence.confidenceLabel")}
                             </span>
                           </div>
                           <p className="text-sm font-medium">{learning.whatHappened}</p>
@@ -266,7 +260,7 @@ export default function Intelligence() {
                           {learning.pattern && (
                             <p className="text-xs text-amber-300 mt-1 flex items-start gap-1">
                               <Star className="w-3 h-3 mt-0.5 shrink-0" />
-                              Pattern: {learning.pattern}
+                              {t("intelligence.pattern")}: {learning.pattern}
                             </p>
                           )}
                         </div>
@@ -285,7 +279,7 @@ export default function Intelligence() {
             <div>
               <h3 className="text-sm font-semibold text-amber-400 mb-2 flex items-center gap-1.5">
                 <Clock className="w-4 h-4" />
-                {language === "ar" ? "تنتظر موافقتك" : "Awaiting Your Approval"}
+                {t("intelligence.awaitingApproval")}
               </h3>
               <div className="space-y-2">
                 {pendingRules.map((rule: any) => (
@@ -301,9 +295,9 @@ export default function Intelligence() {
                           <div className="flex items-center gap-2 mt-2 flex-wrap">
                             <Badge variant="outline" className="text-xs">{rule.appliesTo}</Badge>
                             <span className="text-xs text-muted-foreground">
-                              {Math.round(parseFloat(rule.confidence ?? "0.8") * 100)}% confidence
+                              {Math.round(parseFloat(rule.confidence ?? "0.8") * 100)}% {t("intelligence.confidenceLabel")}
                             </span>
-                            <div className="ml-auto flex gap-2">
+                            <div className="ms-auto flex gap-2">
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -311,7 +305,7 @@ export default function Intelligence() {
                                 onClick={() => rejectRuleMut.mutate({ ruleId: rule.id })}
                                 disabled={rejectRuleMut.isPending}
                               >
-                                <XCircle className="w-3 h-3 mr-1" /> Reject
+                                <XCircle className="w-3 h-3 me-1" /> {t("intelligence.rejectRule")}
                               </Button>
                               <Button
                                 size="sm"
@@ -319,7 +313,7 @@ export default function Intelligence() {
                                 onClick={() => approveRuleMut.mutate({ ruleId: rule.id })}
                                 disabled={approveRuleMut.isPending}
                               >
-                                <CheckCircle className="w-3 h-3 mr-1" /> Approve & Activate
+                                <CheckCircle className="w-3 h-3 me-1" /> {t("intelligence.approveActivate")}
                               </Button>
                             </div>
                           </div>
@@ -336,7 +330,7 @@ export default function Intelligence() {
             <div>
               <h3 className="text-sm font-semibold text-emerald-400 mb-2 flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4" />
-                {language === "ar" ? "القواعد النشطة" : "Active Rules"}
+                {t("intelligence.activeRulesLabel")}
               </h3>
               <div className="space-y-2">
                 {activeRules.map((rule: any) => (
@@ -349,11 +343,11 @@ export default function Intelligence() {
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <Badge variant="outline" className="text-xs">{rule.appliesTo}</Badge>
                             <span className="text-xs text-muted-foreground">
-                              Applied {rule.timesApplied ?? 0} times
+                              {t("intelligence.appliedTimes").replace("{n}", rule.timesApplied ?? 0)}
                             </span>
                             {rule.approvedBy && (
                               <span className="text-xs text-muted-foreground">
-                                · Approved by {rule.approvedBy}
+                                · {t("intelligence.approvedBy")} {rule.approvedBy}
                               </span>
                             )}
                           </div>
@@ -370,12 +364,8 @@ export default function Intelligence() {
             <Card className="bg-card/50 border-border/50">
               <CardContent className="py-12 text-center text-muted-foreground">
                 <Shield className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                <p className="font-medium">{language === "ar" ? "لا توجد قواعد بعد" : "No rules yet"}</p>
-                <p className="text-sm mt-1">
-                  {language === "ar"
-                    ? "حدد تعلمات من تبويب التعلمات ثم اضغط 'توليد قاعدة'"
-                    : "Select learnings from the Learnings tab, then click 'Generate Rule'"}
-                </p>
+                <p className="font-medium">{t("intelligence.noRules")}</p>
+                <p className="text-sm mt-1">{t("intelligence.noRulesDesc")}</p>
               </CardContent>
             </Card>
           )}
@@ -387,14 +377,10 @@ export default function Intelligence() {
             <Card className="bg-card/50 border-border/50">
               <CardContent className="py-12 text-center text-muted-foreground">
                 <BarChart3 className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                <p className="font-medium">{language === "ar" ? "لا توجد نتائج بعد" : "No campaign results yet"}</p>
-                <p className="text-sm mt-1">
-                  {language === "ar"
-                    ? "أضف نتائج الحملات لإغلاق الحلقة وتوليد تعلمات تلقائية"
-                    : "Add campaign results to close the loop and generate automatic learnings"}
-                </p>
+                <p className="font-medium">{t("intelligence.noCampaigns")}</p>
+                <p className="text-sm mt-1">{t("intelligence.noCampaignsDesc")}</p>
                 <Button size="sm" className="mt-4" onClick={() => setShowResultForm(true)}>
-                  <Plus className="w-4 h-4 mr-2" /> Add First Result
+                  <Plus className="w-4 h-4 me-2" /> {t("intelligence.addFirstResult")}
                 </Button>
               </CardContent>
             </Card>
@@ -423,35 +409,35 @@ export default function Intelligence() {
                         </div>
                         {result.learningExtracted && (
                           <Badge className="bg-purple-500/20 text-purple-300 text-xs">
-                            <Brain className="w-3 h-3 mr-1" /> Learning extracted
+                            <Brain className="w-3 h-3 me-1" /> {t("intelligence.learningExtracted")}
                           </Badge>
                         )}
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {result.actualRoas && (
                           <div>
-                            <p className="text-xs text-muted-foreground">Actual ROAS</p>
+                            <p className="text-xs text-muted-foreground">{t("intelligence.actualRoas")}</p>
                             <p className="text-sm font-semibold text-emerald-400">{parseFloat(result.actualRoas).toFixed(2)}x</p>
                             {result.predictedRoas && (
-                              <p className="text-xs text-muted-foreground">vs {parseFloat(result.predictedRoas).toFixed(2)}x predicted</p>
+                              <p className="text-xs text-muted-foreground">vs {parseFloat(result.predictedRoas).toFixed(2)}x {t("intelligence.predicted")}</p>
                             )}
                           </div>
                         )}
                         {result.actualCpa && (
                           <div>
-                            <p className="text-xs text-muted-foreground">Actual CPA</p>
+                            <p className="text-xs text-muted-foreground">{t("intelligence.actualCpa")}</p>
                             <p className="text-sm font-semibold">${parseFloat(result.actualCpa).toFixed(2)}</p>
                           </div>
                         )}
                         {result.actualSpend && (
                           <div>
-                            <p className="text-xs text-muted-foreground">Spend</p>
+                            <p className="text-xs text-muted-foreground">{t("intelligence.actualSpend")}</p>
                             <p className="text-sm font-semibold">${parseFloat(result.actualSpend).toLocaleString()}</p>
                           </div>
                         )}
                         {result.actualConversions && (
                           <div>
-                            <p className="text-xs text-muted-foreground">Conversions</p>
+                            <p className="text-xs text-muted-foreground">{t("intelligence.actualConversions")}</p>
                             <p className="text-sm font-semibold">{result.actualConversions.toLocaleString()}</p>
                           </div>
                         )}
@@ -473,22 +459,22 @@ export default function Intelligence() {
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <Lock className="w-5 h-5 text-blue-400" />
-                {language === "ar" ? "سياسة الحوكمة" : "Governance Policy"}
+                {t("intelligence.governancePolicy")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {[
-                { icon: XCircle, color: "text-rose-400", title: language === "ar" ? "لا قرار بدون تفسير" : "No decision without explanation", desc: language === "ar" ? "كل قرار يحتوي على reasoning chain كامل قابل للتتبع" : "Every decision includes a full traceable reasoning chain" },
-                { icon: XCircle, color: "text-rose-400", title: language === "ar" ? "لا تنفيذ بدون موافقة" : "No execution without approval", desc: language === "ar" ? "كل proposal يمر بـ approval gate صريح قبل أي تنفيذ" : "Every proposal passes an explicit approval gate before execution" },
-                { icon: XCircle, color: "text-rose-400", title: language === "ar" ? "لا تعلم بدون مراجعة" : "No learning without review", desc: language === "ar" ? "التعلمات تُستخرج تلقائياً لكن القواعد تحتاج موافقتك قبل التفعيل" : "Learnings are auto-extracted but rules require your approval before activation" },
-                { icon: XCircle, color: "text-rose-400", title: language === "ar" ? "لا توسع بدون موافقة" : "No expansion without approval", desc: language === "ar" ? "أي بحث خارجي أو ربط خارجي يحتاج موافقة صريحة" : "Any external research or integration requires explicit approval" },
-                { icon: XCircle, color: "text-rose-400", title: language === "ar" ? "لا تعديل ذاتي بدون حوكمة" : "No self-modification without governance", desc: language === "ar" ? "النظام يقترح فقط — لا يضيف أو يغير أي شيء بدون موافقتك" : "System proposes only — adds or changes nothing without your approval" },
+                { key: "gov.noDecision", descKey: "gov.noDecisionDesc" },
+                { key: "gov.noExecution", descKey: "gov.noExecutionDesc" },
+                { key: "gov.noLearning", descKey: "gov.noLearningDesc" },
+                { key: "gov.noExpansion", descKey: "gov.noExpansionDesc" },
+                { key: "gov.noSelfMod", descKey: "gov.noSelfModDesc" },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3 p-3 bg-card rounded-lg border border-border/50">
-                  <item.icon className={`w-5 h-5 ${item.color} shrink-0 mt-0.5`} />
+                  <XCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium">{item.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+                    <p className="text-sm font-medium">{t(`intelligence.${item.key}`)}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t(`intelligence.${item.descKey}`)}</p>
                   </div>
                 </div>
               ))}
@@ -501,14 +487,14 @@ export default function Intelligence() {
       <Dialog open={showResultForm} onOpenChange={setShowResultForm}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{language === "ar" ? "إضافة نتائج حملة" : "Add Campaign Results"}</DialogTitle>
+            <DialogTitle>{t("intelligence.addCampaignResults")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Proposal</Label>
+              <Label>{t("intelligence.proposal")}</Label>
               <Select value={resultForm.proposalId} onValueChange={v => setResultForm(f => ({ ...f, proposalId: v }))}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select proposal..." />
+                  <SelectValue placeholder={t("intelligence.selectProposal")} />
                 </SelectTrigger>
                 <SelectContent>
                   {(proposals as any[]).filter((p: any) => ["approved","in_execution","complete"].includes(p.status)).map((p: any) => (
@@ -519,50 +505,50 @@ export default function Intelligence() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Actual ROAS</Label>
+                <Label>{t("intelligence.actualRoas")}</Label>
                 <Input placeholder="3.5" value={resultForm.actualRoas} onChange={e => setResultForm(f => ({ ...f, actualRoas: e.target.value }))} />
               </div>
               <div>
-                <Label>Actual CPA ($)</Label>
+                <Label>{t("intelligence.actualCpa")}</Label>
                 <Input placeholder="45.00" value={resultForm.actualCpa} onChange={e => setResultForm(f => ({ ...f, actualCpa: e.target.value }))} />
               </div>
               <div>
-                <Label>Actual Spend ($)</Label>
+                <Label>{t("intelligence.actualSpend")}</Label>
                 <Input placeholder="50000" value={resultForm.actualSpend} onChange={e => setResultForm(f => ({ ...f, actualSpend: e.target.value }))} />
               </div>
               <div>
-                <Label>Conversions</Label>
+                <Label>{t("intelligence.actualConversions")}</Label>
                 <Input placeholder="1200" value={resultForm.actualConversions} onChange={e => setResultForm(f => ({ ...f, actualConversions: e.target.value }))} />
               </div>
             </div>
             <div>
-              <Label>Performance vs Prediction</Label>
+              <Label>{t("intelligence.performanceVsPrediction")}</Label>
               <Select value={resultForm.performanceVsPrediction} onValueChange={v => setResultForm(f => ({ ...f, performanceVsPrediction: v as any }))}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select..." />
+                  <SelectValue placeholder={t("general.select")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="exceeded">Exceeded expectations</SelectItem>
-                  <SelectItem value="met">Met expectations</SelectItem>
-                  <SelectItem value="below">Below expectations</SelectItem>
-                  <SelectItem value="far_below">Far below expectations</SelectItem>
+                  <SelectItem value="exceeded">{t("intelligence.exceeded")}</SelectItem>
+                  <SelectItem value="met">{t("intelligence.met")}</SelectItem>
+                  <SelectItem value="below">{t("intelligence.below")}</SelectItem>
+                  <SelectItem value="far_below">{t("intelligence.farBelow")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Notes</Label>
+              <Label>{t("intelligence.notes")}</Label>
               <Textarea
-                placeholder="What worked? What didn't? Key observations..."
+                placeholder={t("intelligence.notesPlaceholder")}
                 value={resultForm.notes}
                 onChange={e => setResultForm(f => ({ ...f, notes: e.target.value }))}
                 rows={3}
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setShowResultForm(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setShowResultForm(false)}>{t("general.cancel")}</Button>
               <Button
                 onClick={() => {
-                  if (!resultForm.proposalId) { toast.error("Select a proposal"); return; }
+                  if (!resultForm.proposalId) { toast.error(t("general.required")); return; }
                   saveCampaignResultMut.mutate({
                     companyId,
                     proposalId: parseInt(resultForm.proposalId),
@@ -576,7 +562,7 @@ export default function Intelligence() {
                 }}
                 disabled={saveCampaignResultMut.isPending}
               >
-                {saveCampaignResultMut.isPending ? "Saving..." : "Save & Extract Learning"}
+                {saveCampaignResultMut.isPending ? t("intelligence.saving") : t("intelligence.saveAndExtract")}
               </Button>
             </div>
           </div>

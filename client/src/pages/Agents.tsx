@@ -27,8 +27,10 @@ export default function Agents() {
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold">{t("nav.agents")}</h1>
-        <p className="text-muted-foreground text-sm mt-1">Your specialized marketing intelligence team — {agents.length} agents ready</p>
+        <h1 className="text-2xl font-bold">{t("agents.title")}</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          {t("agents.teamDesc")} — {agents.length} {t("agents.agentsReady")}
+        </p>
       </div>
 
       {isLoading ? (
@@ -56,7 +58,7 @@ export default function Agents() {
                 </div>
                 <div className="flex items-center justify-between pt-1">
                   <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{agent.role}</span>
-                  <Badge className="text-[10px] bg-green-500/20 text-green-400">Active</Badge>
+                  <Badge className="text-[10px] bg-green-500/20 text-green-400">{t("agent.active")}</Badge>
                 </div>
               </CardContent>
             </Card>

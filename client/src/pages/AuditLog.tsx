@@ -28,8 +28,8 @@ export default function AuditLog() {
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold">{t("nav.audit")}</h1>
-        <p className="text-muted-foreground text-sm mt-1">Full traceability of all decisions and actions</p>
+        <h1 className="text-2xl font-bold">{t("audit.title")}</h1>
+        <p className="text-muted-foreground text-sm mt-1">{t("audit.subtitleAlt")}</p>
       </div>
 
       {isLoading ? (
@@ -38,16 +38,16 @@ export default function AuditLog() {
         <Card className="bg-card border-border">
           <CardContent className="p-12 text-center">
             <Shield className="w-10 h-10 text-muted-foreground/20 mx-auto mb-3" />
-            <p className="text-muted-foreground text-sm">No audit logs yet</p>
+            <p className="text-muted-foreground text-sm">{t("audit.noLogs")}</p>
           </CardContent>
         </Card>
       ) : (
         <div className="relative">
-          <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
-          <div className="space-y-3 pl-10">
+          <div className="absolute start-4 top-0 bottom-0 w-px bg-border" />
+          <div className="space-y-3 ps-10">
             {logs.map((log) => (
               <div key={log.id} className="relative">
-                <div className="absolute -left-6 top-3 w-3 h-3 rounded-full bg-indigo-500/50 border-2 border-background" />
+                <div className="absolute -start-6 top-3 w-3 h-3 rounded-full bg-indigo-500/50 border-2 border-background" />
                 <Card className="bg-card border-border hover:border-indigo-500/20 transition-all">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-3 flex-wrap">

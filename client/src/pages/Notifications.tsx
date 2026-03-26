@@ -32,7 +32,11 @@ export default function Notifications() {
   });
 
   const markAllRead = trpc.notifications.markAllRead.useMutation({
-    onSuccess: () => { toast.success("All notifications marked as read"); utils.notifications.list.invalidate(); utils.notifications.unreadCount.invalidate(); },
+    onSuccess: () => {
+      toast.success(t("notification.allMarkedRead"));
+      utils.notifications.list.invalidate();
+      utils.notifications.unreadCount.invalidate();
+    },
   });
 
   const unread = notifications.filter((n) => !n.isRead);
@@ -41,12 +45,16 @@ export default function Notifications() {
     <div className="p-6 space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{t("nav.notifications")}</h1>
-          {unread.length > 0 && <Badge className="mt-1 bg-indigo-500/20 text-indigo-400 text-xs">{unread.length} unread</Badge>}
+          <h1 className="text-2xl font-bold">{t("notification.title")}</h1>
+          {unread.length > 0 && (
+            <Badge className="mt-1 bg-indigo-500/20 text-indigo-400 text-xs">
+              {unread.length} {t("notification.unread")}
+            </Badge>
+          )}
         </div>
         {unread.length > 0 && (
           <Button variant="outline" size="sm" onClick={() => markAllRead.mutate({ companyId })} disabled={markAllRead.isPending} className="text-xs">
-            <CheckCheck className="w-3.5 h-3.5 mr-1.5" />Mark all read
+            <CheckCheck className="w-3.5 h-3.5 me-1.5" />{t("notification.markAllReadLabel")}
           </Button>
         )}
       </div>
@@ -57,7 +65,7 @@ export default function Notifications() {
         <Card className="bg-card border-border">
           <CardContent className="p-12 text-center">
             <Bell className="w-10 h-10 text-muted-foreground/20 mx-auto mb-3" />
-            <p className="text-muted-foreground text-sm">No notifications yet</p>
+            <p className="text-muted-foreground text-sm">{t("notification.noNotificationsYet")}</p>
           </CardContent>
         </Card>
       ) : (

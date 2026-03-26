@@ -51,12 +51,12 @@ export default function Dashboard() {
           <Building2 className="w-8 h-8 text-indigo-400" />
         </div>
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">No Company Selected</h2>
-          <p className="text-muted-foreground text-sm mb-6">Create or select a company to get started</p>
+          <h2 className="text-xl font-semibold mb-2">{t("company.noSelected")}</h2>
+          <p className="text-muted-foreground text-sm mb-6">{t("company.noSelectedDesc")}</p>
           <Button asChild className="bg-indigo-500 hover:bg-indigo-600">
             <Link href="/companies">
-              <Building2 className="w-4 h-4 mr-2" />
-              Manage Companies
+              <Building2 className="w-4 h-4 me-2" />
+              {t("company.manage")}
             </Link>
           </Button>
         </div>
@@ -76,7 +76,7 @@ export default function Dashboard() {
         </div>
         <Button asChild className="bg-indigo-500 hover:bg-indigo-600 shadow-md shadow-indigo-500/20">
           <Link href="/proposals">
-            <FileText className="w-4 h-4 mr-2" />
+            <FileText className="w-4 h-4 me-2" />
             {t("proposal.new")}
           </Link>
         </Button>
@@ -142,7 +142,7 @@ export default function Dashboard() {
             <h2 className="font-semibold text-foreground">{t("dashboard.activeProposals")}</h2>
             <Button variant="ghost" size="sm" asChild className="text-xs text-muted-foreground">
               <Link href="/proposals">
-                {t("general.view")} <ArrowRight className="w-3 h-3 ml-1" />
+                {t("general.view")} <ArrowRight className="w-3 h-3 ms-1" />
               </Link>
             </Button>
           </div>
@@ -151,7 +151,7 @@ export default function Dashboard() {
             <Card className="bg-card border-border border-dashed">
               <CardContent className="p-8 text-center">
                 <Brain className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">No proposals yet. Create your first one!</p>
+                <p className="text-sm text-muted-foreground">{t("dashboard.noProposals")}</p>
                 <Button asChild size="sm" className="mt-4 bg-indigo-500 hover:bg-indigo-600">
                   <Link href="/proposals">{t("proposal.new")}</Link>
                 </Button>
@@ -167,7 +167,7 @@ export default function Dashboard() {
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-sm truncate">{proposal.title}</p>
                           <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                            {proposal.type} · {proposal.budget ? `$${Number(proposal.budget).toLocaleString()}` : "No budget"}
+                            {proposal.type} · {proposal.budget ? `$${Number(proposal.budget).toLocaleString()}` : t("proposal.noBudget")}
                           </p>
                         </div>
                         <Badge className={`${statusColors[proposal.status] ?? "bg-slate-500/20 text-slate-400"} text-xs flex-shrink-0`}>
@@ -190,14 +190,14 @@ export default function Dashboard() {
                     <AlertCircle className="w-5 h-5 text-orange-400 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-orange-300">
-                        {pendingApprovals.length} {t("approval.pending")}
+                        {pendingApprovals.length} {t("approval.pendingCount")}
                       </p>
-                      <p className="text-xs text-orange-400/70">Requires your attention</p>
+                      <p className="text-xs text-orange-400/70">{t("dashboard.requiresAttention")}</p>
                     </div>
                   </div>
                   <Button asChild size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
                     <Link href="/approvals">
-                      {t("general.view")} <ArrowRight className="w-3 h-3 ml-1" />
+                      {t("general.view")} <ArrowRight className="w-3 h-3 ms-1" />
                     </Link>
                   </Button>
                 </div>
@@ -212,7 +212,7 @@ export default function Dashboard() {
             <h2 className="font-semibold text-foreground">{t("dashboard.recentActivity")}</h2>
             <Button variant="ghost" size="sm" asChild className="text-xs text-muted-foreground">
               <Link href="/audit">
-                {t("general.view")} <ArrowRight className="w-3 h-3 ml-1" />
+                {t("general.view")} <ArrowRight className="w-3 h-3 ms-1" />
               </Link>
             </Button>
           </div>
@@ -222,7 +222,7 @@ export default function Dashboard() {
               <Card className="bg-card border-border border-dashed">
                 <CardContent className="p-6 text-center">
                   <Clock className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-                  <p className="text-xs text-muted-foreground">No activity yet</p>
+                  <p className="text-xs text-muted-foreground">{t("dashboard.noActivity")}</p>
                 </CardContent>
               </Card>
             ) : (
