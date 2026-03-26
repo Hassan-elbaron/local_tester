@@ -54,6 +54,13 @@ import {
   ExecutionReceipt,
   MemoryWriteRequest,
 } from "./orchestration_contract";
+import {
+  buildCampaignExecutionPayload,
+  buildContentExecutionPayload,
+  buildOptimizationExecutionPayload,
+  buildSupportExecutionPayload,
+  buildCommunityExecutionPayload,
+} from "./flow_execution_payloads";
 
 // ─── Canonical Task → Agent Weights ──────────────────────────────────────────
 // Keyed by BrainTaskType; values are per-agent weight overrides (0-1).
@@ -334,7 +341,8 @@ function buildEvidence(companyContext: string): BrainEvidence[] {
 const META_ADS_EXECUTION_TYPES = new Set(["campaign"]);       // → Meta Ads Graph API
 const CMS_EXECUTION_TYPES      = new Set(["content"]);        // → CMS webhook bridge
 const WEBHOOK_EXECUTION_TYPES  = new Set(["optimization"]);   // → generic webhook
-const SENDGRID_EXECUTION_TYPES = new Set(["support", "community"]);  // → SendGrid v3 API
+const SENDGRID_EXECUTION_TYPES = new Set(["support"]);      // → SendGrid v3 API
+const CRM_EXECUTION_TYPES      = new Set(["community"]);  // → CRM webhook bridge
 
 function buildExecutionRequest(params: {
   companyId:         number;
