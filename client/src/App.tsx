@@ -46,6 +46,7 @@ import StrategyFlowPage from "./pages/StrategyFlowPage";
 import CampaignLaunchPage from "./pages/CampaignLaunchPage";
 import ContentCalendarPage from "./pages/ContentCalendarPage";
 import OptimizationLoopPage from "./pages/OptimizationLoopPage";
+import FlowsIndexPage from "./pages/FlowsIndexPage";
 import { getLoginUrl } from "./const";
 import { Button } from "@/components/ui/button";
 import { Brain, Loader2 } from "lucide-react";
@@ -140,6 +141,7 @@ function Router() {
       <Route path="/campaign-launch" component={CampaignLaunchPage} />
       <Route path="/content-calendar" component={ContentCalendarPage} />
       <Route path="/optimization-loop" component={OptimizationLoopPage} />
+      <Route path="/flows" component={FlowsIndexPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

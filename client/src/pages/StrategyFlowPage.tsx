@@ -32,7 +32,7 @@ export default function StrategyFlowPage() {
   const [notes,          setNotes]          = useState("");
 
   const [result,  setResult]  = useState<StrategyResult | null>(null);
-  const [section, setSection] = useState<"decision" | "deliberation" | "memory">("decision");
+  const [section, setSection] = useState<"decision" | "deliberation" | "memory" | "execution">("decision");
 
   const run = trpc.strategyFlow.run.useMutation({
     onSuccess: (data) => setResult(data as StrategyResult),
@@ -172,8 +172,8 @@ export default function StrategyFlowPage() {
           )}
 
           {/* Section tabs */}
-          <div className="flex gap-2 text-xs">
-            {(["decision", "deliberation", "memory"] as const).map((s) => (
+          <div className="flex gap-2 text-xs flex-wrap">
+            {(["decision", "deliberation", "memory", "execution"] as const).map((s) => (
               <button
                 key={s}
                 onClick={() => setSection(s)}
@@ -185,7 +185,8 @@ export default function StrategyFlowPage() {
               >
                 {s === "decision"      ? "Decision"
                 : s === "deliberation" ? "Deliberation"
-                : "Memory Writes"}
+                : s === "memory"       ? "Memory Writes"
+                : "Execution"}
               </button>
             ))}
           </div>
@@ -254,6 +255,26 @@ export default function StrategyFlowPage() {
                 <pre className="text-xs bg-muted p-4 rounded overflow-auto max-h-[500px] whitespace-pre-wrap">
                   {JSON.stringify(result.memoryWrites, null, 2)}
                 </pre>
+              )}
+            </div>
+          )}
+
+          {/* Execution */}
+          {section === "execution" && (
+            <div>
+              {result.execution ? (
+                <>
+                  {(result.execution as Record<string, unknown>).status === "blocked" && (
+                    <p className="text-xs text-yellow-700 mb-2 font-medium">
+                      Execution blocked — pending approval or guard. Check /brain-approvals.
+                    </p>
+                  )}
+                  <pre className="text-xs bg-muted p-4 rounded overflow-auto max-h-[500px] whitespace-pre-wrap">
+                    {JSON.stringify(result.execution, null, 2)}
+                  </pre>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">No execution data.</p>
               )}
             </div>
           )}
