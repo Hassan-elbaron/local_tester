@@ -331,8 +331,9 @@ function buildEvidence(companyContext: string): BrainEvidence[] {
 }
 
 // Task types that route to external connectors.
-const META_ADS_EXECUTION_TYPES = new Set(["campaign"]);                  // → Meta Ads Graph API
-const WEBHOOK_EXECUTION_TYPES  = new Set(["content", "optimization"]);   // → generic webhook
+const META_ADS_EXECUTION_TYPES = new Set(["campaign"]);       // → Meta Ads Graph API
+const CMS_EXECUTION_TYPES      = new Set(["content"]);        // → CMS webhook bridge
+const WEBHOOK_EXECUTION_TYPES  = new Set(["optimization"]);   // → generic webhook
 const SENDGRID_EXECUTION_TYPES = new Set(["support", "community"]);  // → SendGrid v3 API
 
 function buildExecutionRequest(params: {
@@ -403,7 +404,32 @@ function buildExecutionRequest(params: {
     };
   }
 
-  // ── Webhook connector: content / optimization ────────────────────────────
+  // ── CMS connector: content tasks ────────────────────────────────────────
+  if (CMS_EXECUTION_TYPES.has(taskType)) {
+    const brandLine = params.proposalContext.split("\n").find(l => l.startsWith("Brand:"));
+    const brandName = brandLine ? brandLine.replace(/^Brand:\s*/i, "").trim() : "Unknown";
+    return {
+      companyId:  params.companyId,
+      proposalId: params.proposalId,
+      taskId:     params.taskId,
+      decision:   params.decision,
+      mode:       "external",
+      target:     "cms",
+      payload: {
+        action:  "create_draft",
+        title:   `${brandName} Content Draft`,
+        content: params.proposalContext.slice(0, 5000),
+        status:  "draft",
+        metadata: {
+          source:       "ai_marketing_brain_os",
+          proposalType: "content",
+          taskId:       params.taskId,
+        },
+      },
+    };
+  }
+
+  // ── Webhook connector: optimization ─────────────────────────────────────
   if (WEBHOOK_EXECUTION_TYPES.has(taskType)) {
     return {
       companyId:  params.companyId,

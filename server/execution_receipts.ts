@@ -26,6 +26,7 @@ import { EmailExecutionAdapter } from "./execution_adapters/email_adapter";
 import { MetaAdsExecutionAdapter } from "./execution_adapters/meta_ads_adapter";
 import { SendGridEmailExecutionAdapter } from "./execution_adapters/sendgrid_email_adapter";
 import { CrmExecutionAdapter } from "./execution_adapters/crm_adapter";
+import { CmsExecutionAdapter } from "./execution_adapters/cms_adapter";
 
 // ─── External Result (from adapter) ──────────────────────────────────────────
 export interface ExternalExecutionResult {
@@ -75,6 +76,7 @@ const EXECUTION_ADAPTERS: ExecutionAdapter[] = [
   new MetaAdsExecutionAdapter(),        // real: campaign    → Meta Ads Graph API
   new SendGridEmailExecutionAdapter(),   // real: support     → SendGrid v3 API
   new CrmExecutionAdapter(),             // real: community   → CRM webhook bridge
+  new CmsExecutionAdapter(),             // real: content     → CMS webhook bridge
   new EmailExecutionAdapter(),           // legacy: email webhook fallback
   new WebhookExecutionAdapter(),         // generic: content / optimization
   new InternalNoopAdapter(),             // fallback: all other internal tasks
