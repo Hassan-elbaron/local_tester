@@ -331,8 +331,9 @@ function buildEvidence(companyContext: string): BrainEvidence[] {
 }
 
 // Task types that route to external connectors.
-const WEBHOOK_EXECUTION_TYPES = new Set(["campaign", "content", "optimization"]);
-const EMAIL_EXECUTION_TYPES   = new Set(["support", "community"]);
+const META_ADS_EXECUTION_TYPES = new Set(["campaign"]);                  // → Meta Ads Graph API
+const WEBHOOK_EXECUTION_TYPES  = new Set(["content", "optimization"]);   // → generic webhook
+const EMAIL_EXECUTION_TYPES    = new Set(["support", "community"]);
 
 function buildExecutionRequest(params: {
   companyId:       number;
@@ -361,7 +362,23 @@ function buildExecutionRequest(params: {
     };
   }
 
-  // ── Webhook connector: campaign / content / optimization ──────────────────
+  // ── Meta Ads connector: campaign tasks ─────────────────────────────────
+  if (META_ADS_EXECUTION_TYPES.has(taskType)) {
+    return {
+      companyId:  params.companyId,
+      proposalId: params.proposalId,
+      taskId:     params.taskId,
+      decision:   params.decision,
+      mode:       "external",
+      target:     "meta_ads",
+      payload: {
+        proposalType:    params.proposalType,
+        proposalContext: params.proposalContext,
+      },
+    };
+  }
+
+  // ── Webhook connector: content / optimization ────────────────────────────
   if (WEBHOOK_EXECUTION_TYPES.has(taskType)) {
     return {
       companyId:  params.companyId,

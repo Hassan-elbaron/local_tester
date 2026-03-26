@@ -23,6 +23,7 @@ import {
 } from "./orchestration_contract";
 import { WebhookExecutionAdapter } from "./execution_adapters/webhook_adapter";
 import { EmailExecutionAdapter } from "./execution_adapters/email_adapter";
+import { MetaAdsExecutionAdapter } from "./execution_adapters/meta_ads_adapter";
 
 // ─── External Result (from adapter) ──────────────────────────────────────────
 export interface ExternalExecutionResult {
@@ -69,8 +70,9 @@ export class InternalNoopAdapter implements ExecutionAdapter {
 // Adapters are checked in order — first canHandle() match wins.
 // Typed connectors (email) are checked before the generic webhook fallback.
 const EXECUTION_ADAPTERS: ExecutionAdapter[] = [
+  new MetaAdsExecutionAdapter(), // real: campaign tasks → Meta Ads Graph API
   new EmailExecutionAdapter(),   // typed: support / community tasks
-  new WebhookExecutionAdapter(), // generic: campaign / content / optimization
+  new WebhookExecutionAdapter(), // generic: content / optimization (webhook fallback)
   new InternalNoopAdapter(),     // fallback: all other internal tasks
 ];
 
