@@ -22,6 +22,7 @@ import {
   MemoryWriteRequest,
 } from "./orchestration_contract";
 import { WebhookExecutionAdapter } from "./execution_adapters/webhook_adapter";
+import { EmailExecutionAdapter } from "./execution_adapters/email_adapter";
 
 // ─── External Result (from adapter) ──────────────────────────────────────────
 export interface ExternalExecutionResult {
@@ -66,11 +67,11 @@ export class InternalNoopAdapter implements ExecutionAdapter {
 
 // ─── Adapter Registry ─────────────────────────────────────────────────────────
 // Adapters are checked in order — first canHandle() match wins.
-// WebhookExecutionAdapter is checked before InternalNoopAdapter so that
-// any explicit "webhook" target routes to the real connector.
+// Typed connectors (email) are checked before the generic webhook fallback.
 const EXECUTION_ADAPTERS: ExecutionAdapter[] = [
-  new WebhookExecutionAdapter(),
-  new InternalNoopAdapter(),
+  new EmailExecutionAdapter(),   // typed: support / community tasks
+  new WebhookExecutionAdapter(), // generic: campaign / content / optimization
+  new InternalNoopAdapter(),     // fallback: all other internal tasks
 ];
 
 function resolveAdapter(target: string): ExecutionAdapter | undefined {

@@ -330,28 +330,61 @@ function buildEvidence(companyContext: string): BrainEvidence[] {
   ];
 }
 
-// Proposal types that trigger external execution via the webhook adapter.
-// All other types fall back to internal (no-op) execution.
-const EXTERNAL_EXECUTION_TYPES = new Set(["campaign", "content", "optimization"]);
+// Task types that route to external connectors.
+const WEBHOOK_EXECUTION_TYPES = new Set(["campaign", "content", "optimization"]);
+const EMAIL_EXECUTION_TYPES   = new Set(["support", "community"]);
 
 function buildExecutionRequest(params: {
-  companyId: number;
-  proposalId: number;
-  taskId: string;
-  decision: BrainDecision;
-  proposalType: string;
+  companyId:       number;
+  proposalId:      number;
+  taskId:          string;
+  decision:        BrainDecision;
+  proposalType:    string;
   proposalContext: string;
 }): BrainExecutionRequest {
   const taskType = normalizeTaskType(params.proposalType);
-  const isExternal = EXTERNAL_EXECUTION_TYPES.has(taskType);
 
+  // ── Email connector: support + community tasks ─────────────────────────────
+  if (EMAIL_EXECUTION_TYPES.has(taskType)) {
+    return {
+      companyId:  params.companyId,
+      proposalId: params.proposalId,
+      taskId:     params.taskId,
+      decision:   params.decision,
+      mode:       "external",
+      target:     "email",
+      payload: {
+        to:      process.env.TEAM_EMAIL ?? "team@example.com",
+        subject: `AI Marketing — ${taskType} action required`,
+        body:    params.proposalContext,
+      },
+    };
+  }
+
+  // ── Webhook connector: campaign / content / optimization ──────────────────
+  if (WEBHOOK_EXECUTION_TYPES.has(taskType)) {
+    return {
+      companyId:  params.companyId,
+      proposalId: params.proposalId,
+      taskId:     params.taskId,
+      decision:   params.decision,
+      mode:       "external",
+      target:     "webhook",
+      payload: {
+        proposalType:    params.proposalType,
+        proposalContext: params.proposalContext,
+      },
+    };
+  }
+
+  // ── Internal no-op: strategy / research / analytics / etc. ───────────────
   return {
     companyId:  params.companyId,
     proposalId: params.proposalId,
     taskId:     params.taskId,
     decision:   params.decision,
-    mode:       isExternal ? "external" : "internal",
-    target:     isExternal ? "webhook"  : "internal",
+    mode:       "internal",
+    target:     "internal",
     payload: {
       proposalType:    params.proposalType,
       proposalContext: params.proposalContext,
