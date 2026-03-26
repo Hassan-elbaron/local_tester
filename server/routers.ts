@@ -79,6 +79,7 @@ import { approvalRouter } from "./approval_router";
 import { brandAuditRouter } from "./flows/brand_audit";
 import { strategyFlowRouter } from "./flows/strategy_flow";
 import { campaignLaunchRouter } from "./flows/campaign_launch";
+import { contentCalendarRouter } from "./flows/content_calendar";
 import { runExecutionWithReceipt, persistExecutionReceipt } from "./execution_receipts";
 import { validateExecutionGate } from "./execution_gate";
 import { getLatestBrainRun, getBrainRunHistory } from "./replay_service";
@@ -2390,6 +2391,7 @@ export const appRouter = router({
   brandAudit: brandAuditRouter,
   strategyFlow: strategyFlowRouter,
   campaignLaunch: campaignLaunchRouter,
+  contentCalendar: contentCalendarRouter,
 });
 
 export type AppRouter = typeof appRouter;
