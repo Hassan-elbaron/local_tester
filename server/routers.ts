@@ -79,6 +79,8 @@ import { approvalRouter } from "./approval_router";
 import { runExecutionWithReceipt, persistExecutionReceipt } from "./execution_receipts";
 import { validateExecutionGate } from "./execution_gate";
 import { getLatestBrainRun, getBrainRunHistory } from "./replay_service";
+import { getSystemHealth, getConnectorMetrics } from "./observability";
+import { getAgentPolicyTrace, getAgentPerformanceSummary } from "./agent_metrics";
 import {
   STRATEGY_SECTIONS,
   snapshotStrategy,
@@ -2221,6 +2223,37 @@ const commandCenterRouter = router({
     }),
 });
 
+// ─── Observability Router ─────────────────────────────────────────────────────
+const observabilityRouter = router({
+  /** Overall system health + rolling 24h totals */
+  health: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ input }) => {
+      return await getSystemHealth(input.companyId);
+    }),
+
+  /** Per-connector execution counts grouped by executor + status */
+  connectors: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ input }) => {
+      return await getConnectorMetrics(input.companyId);
+    }),
+
+  /** Per-agent cloud vs local routing breakdown from model_policy traces */
+  agents: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ input }) => {
+      return await getAgentPolicyTrace(input.companyId);
+    }),
+
+  /** Agent participation frequency from deliberation summaries */
+  agentPerformance: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ input }) => {
+      return await getAgentPerformanceSummary(input.companyId);
+    }),
+});
+
 export const appRouter = router({
   system: systemRouter,
   auth: router({
@@ -2256,6 +2289,7 @@ export const appRouter = router({
   learning: learningRouter,
   commandCenter: commandCenterRouter,
   brainApproval: approvalRouter,
+  observability: observabilityRouter,
 });
 
 export type AppRouter = typeof appRouter;
