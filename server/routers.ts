@@ -1484,6 +1484,17 @@ const executionRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      // Duplicate execution guard — block if this taskId was already executed
+      const { preventDuplicateExecution: guardDup } = await import("./system_guard");
+      const dupCheck = await guardDup({
+        companyId:  input.decision.companyId,
+        taskId:     input.decision.taskId,
+        actionType: input.request.target,
+      });
+      if (!dupCheck.allowed) {
+        return { status: "blocked" as const, reason: dupCheck.reason, receipt: null };
+      }
+
       const gate = validateExecutionGate(input.decision as any, input.request as any);
 
       if (!gate.allowed) {

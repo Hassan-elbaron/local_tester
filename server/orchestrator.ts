@@ -12,6 +12,12 @@ import { invokeLLM } from "./_core/llm";
 import { invokeRoutedLLM } from "./model_router";
 import { decideAutonomy } from "./autonomy_policy";
 import { persistBrainRunLedger } from "./decision_ledger";
+import {
+  preventDuplicateExecution,
+  preventInfiniteLoop,
+  acquireRunSlot,
+  releaseRunSlot,
+} from "./system_guard";
 import { validateExecutionGate } from "./execution_gate";
 import {
   runExecutionWithReceipt,
@@ -100,6 +106,8 @@ export interface OrchestratedDeliberationResult {
   summary: string;
   summaryAr: string;
   brainRun: BrainRunResult;
+  /** Set when a system guard blocked the run before deliberation started */
+  guardBlocked?: { guard: string; reason: string };
 }
 
 export interface DecisionTrace {
@@ -361,6 +369,43 @@ export async function runOrchestratedDeliberation(params: {
 }): Promise<OrchestratedDeliberationResult> {
   const { proposalId, companyId, proposalType, proposalContext, budget } = params;
 
+  // ── System Guards (pre-flight) ────────────────────────────────────────────
+  // 1a. Duplicate run guard — block if this proposal already has a brain_run ledger entry
+  const duplicateCheck = await preventDuplicateExecution({
+    companyId,
+    taskId: `proposal_${proposalId}`,
+  });
+  if (!duplicateCheck.allowed) {
+    return {
+      proposalId, companyId,
+      deliberationId: 0, rounds: [], selectedAgents: [],
+      weightedConsensusScore: 0, dissentSummary: [],
+      finalRecommendation: "", finalRecommendationAr: "",
+      decisionTrace: { routing: { reason: "", agentsSelected: [], agentsExcluded: [] }, rounds: [], finalDecision: { chosenOption: "", reason: "", confidence: 0, dissents: 0 } },
+      escalated: false, summary: "", summaryAr: "",
+      brainRun: { task: { id: "", companyId, proposalId, type: "strategy", action: "recommend", title: "", description: "", input: {}, stage: "intake", createdAt: new Date().toISOString() }, memoryWrites: [] },
+      guardBlocked: { guard: "preventDuplicateExecution", reason: duplicateCheck.reason! },
+    };
+  }
+
+  // 1b. Concurrency guard — block if company already has too many active runs
+  const slotCheck = acquireRunSlot(companyId);
+  if (!slotCheck.allowed) {
+    return {
+      proposalId, companyId,
+      deliberationId: 0, rounds: [], selectedAgents: [],
+      weightedConsensusScore: 0, dissentSummary: [],
+      finalRecommendation: "", finalRecommendationAr: "",
+      decisionTrace: { routing: { reason: "", agentsSelected: [], agentsExcluded: [] }, rounds: [], finalDecision: { chosenOption: "", reason: "", confidence: 0, dissents: 0 } },
+      escalated: false, summary: "", summaryAr: "",
+      brainRun: { task: { id: "", companyId, proposalId, type: "strategy", action: "recommend", title: "", description: "", input: {}, stage: "intake", createdAt: new Date().toISOString() }, memoryWrites: [] },
+      guardBlocked: { guard: "acquireRunSlot", reason: slotCheck.reason! },
+    };
+  }
+
+  // Slot acquired — wrap the rest in try/finally to always release it
+  try {
+
   // 1. Build rich company context
   const [intelligenceCtx, knowledgeCtx] = await Promise.all([
     buildIntelligenceContext(companyId),
@@ -416,6 +461,13 @@ export async function runOrchestratedDeliberation(params: {
   let prevConsensus = 0;
 
   for (const round of ROUNDS) {
+    // Loop guard — hard cap on iterations (safety net against runaway loops)
+    const loopCheck = preventInfiniteLoop({ iterationCount: allRounds.length });
+    if (!loopCheck.allowed) {
+      console.warn(`[orchestrator] ${loopCheck.reason} — stopping deliberation early`);
+      break;
+    }
+
     const opinions = await Promise.all(
       selected.map(({ agent, weight }) =>
         getOpinion(agent, weight, round, enrichedProposalContext, companyContext, previousSummary, taskType)
@@ -753,4 +805,9 @@ export async function runOrchestratedDeliberation(params: {
     summaryAr,
     brainRun,
   };
+
+  } finally {
+    // Always release the concurrency slot, even if the run threw
+    releaseRunSlot(companyId);
+  }
 }
