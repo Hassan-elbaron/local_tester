@@ -77,6 +77,7 @@ import {
 } from "./command_center";
 import { approvalRouter } from "./approval_router";
 import { brandAuditRouter } from "./flows/brand_audit";
+import { strategyFlowRouter } from "./flows/strategy_flow";
 import { runExecutionWithReceipt, persistExecutionReceipt } from "./execution_receipts";
 import { validateExecutionGate } from "./execution_gate";
 import { getLatestBrainRun, getBrainRunHistory } from "./replay_service";
@@ -2386,6 +2387,7 @@ export const appRouter = router({
   brainApproval: approvalRouter,
   observability: observabilityRouter,
   brandAudit: brandAuditRouter,
+  strategyFlow: strategyFlowRouter,
 });
 
 export type AppRouter = typeof appRouter;

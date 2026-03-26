@@ -42,6 +42,7 @@ import MemoryPage from "./pages/MemoryPage";
 import MemoryDetailPage from "./pages/MemoryDetailPage";
 import ObservabilityPage from "./pages/ObservabilityPage";
 import BrandAuditPage from "./pages/BrandAuditPage";
+import StrategyFlowPage from "./pages/StrategyFlowPage";
 import { getLoginUrl } from "./const";
 import { Button } from "@/components/ui/button";
 import { Brain, Loader2 } from "lucide-react";
@@ -132,6 +133,7 @@ function Router() {
       <Route path="/memory/:key" component={MemoryDetailPage} />
       <Route path="/observability" component={ObservabilityPage} />
       <Route path="/brand-audit" component={BrandAuditPage} />
+      <Route path="/strategy-flow" component={StrategyFlowPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
