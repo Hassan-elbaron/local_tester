@@ -333,7 +333,7 @@ function buildEvidence(companyContext: string): BrainEvidence[] {
 // Task types that route to external connectors.
 const META_ADS_EXECUTION_TYPES = new Set(["campaign"]);                  // → Meta Ads Graph API
 const WEBHOOK_EXECUTION_TYPES  = new Set(["content", "optimization"]);   // → generic webhook
-const EMAIL_EXECUTION_TYPES    = new Set(["support", "community"]);
+const SENDGRID_EXECUTION_TYPES = new Set(["support", "community"]);  // → SendGrid v3 API
 
 function buildExecutionRequest(params: {
   companyId:       number;
@@ -346,14 +346,14 @@ function buildExecutionRequest(params: {
   const taskType = normalizeTaskType(params.proposalType);
 
   // ── Email connector: support + community tasks ─────────────────────────────
-  if (EMAIL_EXECUTION_TYPES.has(taskType)) {
+  if (SENDGRID_EXECUTION_TYPES.has(taskType)) {
     return {
       companyId:  params.companyId,
       proposalId: params.proposalId,
       taskId:     params.taskId,
       decision:   params.decision,
       mode:       "external",
-      target:     "email",
+      target:     "sendgrid_email",
       payload: {
         to:      process.env.TEAM_EMAIL ?? "team@example.com",
         subject: `AI Marketing — ${taskType} action required`,
