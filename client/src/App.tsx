@@ -36,6 +36,10 @@ import DecisionsPage from "./pages/DecisionsPage";
 import RunsPage from "./pages/RunsPage";
 import RunDetailPage from "./pages/RunDetailPage";
 import BrainApprovalsPage from "./pages/BrainApprovalsPage";
+import ExecutionsPage from "./pages/ExecutionsPage";
+import ExecutionDetailPage from "./pages/ExecutionDetailPage";
+import MemoryPage from "./pages/MemoryPage";
+import MemoryDetailPage from "./pages/MemoryDetailPage";
 import { getLoginUrl } from "./const";
 import { Button } from "@/components/ui/button";
 import { Brain, Loader2 } from "lucide-react";
@@ -120,6 +124,10 @@ function Router() {
       <Route path="/runs" component={RunsPage} />
       <Route path="/runs/:taskId" component={RunDetailPage} />
       <Route path="/brain-approvals" component={BrainApprovalsPage} />
+      <Route path="/executions" component={ExecutionsPage} />
+      <Route path="/executions/:taskId" component={ExecutionDetailPage} />
+      <Route path="/memory" component={MemoryPage} />
+      <Route path="/memory/:key" component={MemoryDetailPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

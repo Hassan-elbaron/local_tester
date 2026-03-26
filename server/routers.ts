@@ -37,7 +37,7 @@ import { storagePut } from "./storage";
 import { setActiveLlmOverride, invokeLLM } from "./_core/llm";
 import { getDb } from "./db";
 import { llmConfigs, integrations } from "../drizzle/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, ne } from "drizzle-orm";
 import {
   runDeliberation, getDeliberationSession, getCompanyDeliberations,
   approveDeliberation, reviseDeliberation, rejectDeliberation,
@@ -93,7 +93,7 @@ import {
 } from "./strategy_versioning";
 import {
   deliberationSessions, decisions, seoAudits, externalIdeas, skillsRegistry,
-  strategyVersions,
+  strategyVersions, executionLogs, brainMemory,
 } from "../drizzle/schema";
 import {
   approveDecision,
@@ -574,6 +574,48 @@ const memoryRouter = router({
     .mutation(async ({ input }) => {
       await upsertCompanyMemory(input.companyId, input.key, input.value, input.category);
       return { success: true };
+    }),
+
+  // ── Brain Memory: list (without value) ────────────────────────────────────
+  brainList: protectedProcedure
+    .input(z.object({ companyId: z.number().int().positive() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      const rows = await db
+        .select({
+          id:         brainMemory.id,
+          scope:      brainMemory.scope,
+          key:        brainMemory.key,
+          source:     brainMemory.source,
+          confidence: brainMemory.confidence,
+          createdAt:  brainMemory.createdAt,
+        })
+        .from(brainMemory)
+        .where(eq(brainMemory.companyId, input.companyId))
+        .orderBy(desc(brainMemory.createdAt))
+        .limit(100);
+      return { items: rows };
+    }),
+
+  // ── Brain Memory: single record by key (latest) ────────────────────────────
+  brainGet: protectedProcedure
+    .input(z.object({ companyId: z.number().int().positive(), key: z.string() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      const rows = await db
+        .select()
+        .from(brainMemory)
+        .where(
+          and(
+            eq(brainMemory.companyId, input.companyId),
+            eq(brainMemory.key, input.key),
+          ),
+        )
+        .orderBy(desc(brainMemory.createdAt))
+        .limit(1);
+      return { row: rows[0] ?? null };
     }),
 });
 
@@ -1452,6 +1494,58 @@ const executionRouter = router({
         limit:      input.limit,
       });
       return { rows };
+    }),
+
+  // ── Execution Logs: list non-brain_run records ────────────────────────────
+  executions: protectedProcedure
+    .input(z.object({ companyId: z.number().int().positive() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      const rows = await db
+        .select()
+        .from(executionLogs)
+        .where(
+          and(
+            eq(executionLogs.companyId, input.companyId),
+            ne(executionLogs.actionType, "brain_run"),
+          ),
+        )
+        .orderBy(desc(executionLogs.createdAt))
+        .limit(50);
+      return {
+        items: rows.map((r) => ({
+          id:          r.id,
+          taskId:      r.taskId,
+          actionType:  r.actionType,
+          status:      r.status,
+          executor:    r.executor,
+          externalRef: r.externalRef ?? null,
+          summary:     r.summary,
+          createdAt:   r.createdAt,
+        })),
+      };
+    }),
+
+  // ── Execution Logs: single record by taskId ───────────────────────────────
+  getExecution: protectedProcedure
+    .input(z.object({ companyId: z.number().int().positive(), taskId: z.string() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      const rows = await db
+        .select()
+        .from(executionLogs)
+        .where(
+          and(
+            eq(executionLogs.companyId, input.companyId),
+            eq(executionLogs.taskId, input.taskId),
+            ne(executionLogs.actionType, "brain_run"),
+          ),
+        )
+        .orderBy(desc(executionLogs.createdAt))
+        .limit(1);
+      return { row: rows[0] ?? null };
     }),
 
   // ── Control-Plane: execute an AI decision after human approval ─────────────
