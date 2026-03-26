@@ -9,7 +9,12 @@
  */
 
 import { invokeLLM } from "./_core/llm";
-import { AGENTS, AgentConfig, AgentOpinionResult } from "./agents";
+import { AgentOpinionResult } from "./agents";
+import {
+  CANONICAL_AGENTS,
+  CanonicalAgent,
+  getCanonicalAgentsByTask,
+} from "./canonical_agents";
 import { getCompanyMemory, createDeliberation, saveAgentOpinion, updateDeliberation } from "./db";
 import { buildIntelligenceContext } from "./intelligence";
 import { buildCompanyContext } from "./knowledge";
@@ -18,21 +23,27 @@ import {
   BrainDecision,
   BrainEvidence,
   BrainRunResult,
+  BrainTaskType,
   DeliberationBundle,
   MemoryWriteRequest,
 } from "./orchestration_contract";
 
-// ─── Agent Domain Weights ─────────────────────────────────────────────────────
-// Weight 0-1: how relevant this agent is per proposal type
-const AGENT_DOMAIN_WEIGHTS: Record<string, Record<string, number>> = {
-  paid_media:  { cmo:0.9, paid_media_director:1.0, performance_lead:0.9, creative_director:0.7, copy_chief:0.6, content_strategist:0.5, funnel_architect:0.8, crm_expert:0.5, seo_strategist:0.4, analytics_lead:0.9, brand_strategist:0.6, market_researcher:0.7, budget_controller:0.9 },
-  content:     { cmo:0.8, paid_media_director:0.4, performance_lead:0.5, creative_director:1.0, copy_chief:1.0, content_strategist:1.0, funnel_architect:0.6, crm_expert:0.5, seo_strategist:0.8, analytics_lead:0.6, brand_strategist:0.8, market_researcher:0.7, budget_controller:0.5 },
-  seo:         { cmo:0.7, paid_media_director:0.4, performance_lead:0.6, creative_director:0.5, copy_chief:0.7, content_strategist:0.8, funnel_architect:0.7, crm_expert:0.4, seo_strategist:1.0, analytics_lead:0.8, brand_strategist:0.5, market_researcher:0.7, budget_controller:0.5 },
-  crm:         { cmo:0.8, paid_media_director:0.4, performance_lead:0.6, creative_director:0.4, copy_chief:0.6, content_strategist:0.5, funnel_architect:0.9, crm_expert:1.0, seo_strategist:0.3, analytics_lead:0.8, brand_strategist:0.5, market_researcher:0.7, budget_controller:0.6 },
-  strategy:    { cmo:1.0, paid_media_director:0.7, performance_lead:0.7, creative_director:0.6, copy_chief:0.5, content_strategist:0.6, funnel_architect:0.7, crm_expert:0.6, seo_strategist:0.5, analytics_lead:0.8, brand_strategist:0.9, market_researcher:0.9, budget_controller:0.8 },
-  budget:      { cmo:0.9, paid_media_director:0.8, performance_lead:0.8, creative_director:0.4, copy_chief:0.3, content_strategist:0.4, funnel_architect:0.6, crm_expert:0.5, seo_strategist:0.4, analytics_lead:0.9, brand_strategist:0.5, market_researcher:0.6, budget_controller:1.0 },
-  campaign:    { cmo:0.9, paid_media_director:0.9, performance_lead:0.9, creative_director:0.9, copy_chief:0.8, content_strategist:0.8, funnel_architect:0.8, crm_expert:0.6, seo_strategist:0.6, analytics_lead:0.8, brand_strategist:0.8, market_researcher:0.7, budget_controller:0.8 },
-  funnel:      { cmo:0.8, paid_media_director:0.7, performance_lead:0.8, creative_director:0.6, copy_chief:0.7, content_strategist:0.7, funnel_architect:1.0, crm_expert:0.9, seo_strategist:0.6, analytics_lead:0.8, brand_strategist:0.5, market_researcher:0.6, budget_controller:0.6 },
+// ─── Canonical Task → Agent Weights ──────────────────────────────────────────
+// Keyed by BrainTaskType; values are per-agent weight overrides (0-1).
+// Agents not listed fall back to their defaultWeight in CANONICAL_AGENTS.
+const TASK_AGENT_WEIGHTS: Record<BrainTaskType, Partial<Record<BrainTaskType, number>>> = {
+  strategy:     { strategy: 1.0, research: 0.95, analytics: 0.85, compliance: 0.8,  budget: 0.85, futurist: 0.75 },
+  content:      { content:  1.0, strategy: 0.8,  research:  0.75, analytics:  0.7,  compliance: 0.75 },
+  campaign:     { campaign: 1.0, strategy: 0.85, analytics: 0.85, budget:     0.9,  compliance: 0.8, optimization: 0.9, watchman: 0.7 },
+  analytics:    { analytics:1.0, strategy: 0.7,  optimization:0.85,watchman:  0.8,  compliance: 0.65 },
+  research:     { research: 1.0, strategy: 0.85, futurist:   0.75, analytics: 0.7  },
+  compliance:   { compliance:1.0,strategy: 0.7,  campaign:   0.65, content:   0.65, budget: 0.7 },
+  budget:       { budget:   1.0, strategy: 0.85, campaign:   0.8,  analytics: 0.85, compliance: 0.75 },
+  community:    { community:1.0, content:  0.8,  support:    0.8,  analytics: 0.7,  watchman: 0.7 },
+  watchman:     { watchman: 1.0, analytics:0.85, compliance: 0.8,  optimization:0.7 },
+  optimization: { optimization:1.0, analytics:0.9, campaign: 0.8,  content:   0.7,  watchman: 0.75 },
+  support:      { support:  1.0, community:0.85, content:    0.7,  compliance: 0.7  },
+  futurist:     { futurist: 1.0, strategy: 0.85, research:   0.85, watchman:  0.65  },
 };
 
 // ─── Deliberation Rounds ──────────────────────────────────────────────────────
@@ -76,19 +87,53 @@ export interface DecisionTrace {
   finalDecision: { chosenOption: string; reason: string; confidence: number; dissents: number };
 }
 
-// ─── Agent Selection (Contextual Routing) ────────────────────────────────────
-function selectAgents(proposalType: string, budget?: number): { agent: AgentConfig; weight: number }[] {
-  const weights = AGENT_DOMAIN_WEIGHTS[proposalType] ?? AGENT_DOMAIN_WEIGHTS.strategy;
-  const threshold = budget && budget > 100000 ? 0.5 : 0.65; // high-budget = more agents
-  return AGENTS
-    .map(a => ({ agent: a, weight: weights[a.role] ?? 0.5 }))
+// ─── Task Type Normalizer ─────────────────────────────────────────────────────
+// Maps legacy proposal type strings → canonical BrainTaskType
+function normalizeTaskType(proposalType: string): BrainTaskType {
+  const v = proposalType.toLowerCase().trim();
+  const map: Record<string, BrainTaskType> = {
+    strategy:    "strategy",
+    content:     "content",
+    campaign:    "campaign",
+    paid_media:  "campaign",
+    seo:         "content",
+    crm:         "community",
+    funnel:      "optimization",
+    analytics:   "analytics",
+    research:    "research",
+    compliance:  "compliance",
+    budget:      "budget",
+    community:   "community",
+    watchman:    "watchman",
+    optimization:"optimization",
+    support:     "support",
+    futurist:    "futurist",
+  };
+  return map[v] ?? "strategy";
+}
+
+// ─── Agent Selection (Canonical Routing) ─────────────────────────────────────
+function selectAgents(
+  proposalType: string,
+  budget?: number,
+): { agent: CanonicalAgent; weight: number }[] {
+  const taskType  = normalizeTaskType(proposalType);
+  const pool      = getCanonicalAgentsByTask(taskType);
+  const weights   = TASK_AGENT_WEIGHTS[taskType];
+  const threshold = budget && budget > 100_000 ? 0.65 : 0.75; // high-budget = broader panel
+
+  return pool
+    .map(agent => ({
+      agent,
+      weight: weights[agent.id] ?? agent.defaultWeight,
+    }))
     .filter(x => x.weight >= threshold)
     .sort((a, b) => b.weight - a.weight);
 }
 
 // ─── Single Agent Opinion (one round) ────────────────────────────────────────
 async function getOpinion(
-  agent: AgentConfig,
+  agent: CanonicalAgent,
   weight: number,
   round: DeliberationRound,
   proposalContext: string,
@@ -116,7 +161,7 @@ async function getOpinion(
     const clean = content.replace(/```json\n?|\n?```/g, "").trim();
     const parsed = JSON.parse(clean);
     return {
-      agentRole: agent.role,
+      agentRole: agent.id,
       agentName: agent.name,
       opinion: parsed.opinion ?? "",
       opinionAr: "",
@@ -132,7 +177,7 @@ async function getOpinion(
     };
   } catch {
     return {
-      agentRole: agent.role, agentName: agent.name,
+      agentRole: agent.id, agentName: agent.name,
       opinion: "Unable to generate opinion at this time.",
       opinionAr: "", recommendation: "Proceed with caution.",
       confidence: 0.5, concerns: [], suggestions: [],
@@ -157,7 +202,7 @@ function makeTask(params: {
     id: `task_${params.companyId}_${params.proposalId}_${Date.now()}`,
     companyId: params.companyId,
     proposalId: params.proposalId,
-    type: (params.proposalType as BrainTask["type"]) ?? "strategy",
+    type: normalizeTaskType(params.proposalType),
     action: "recommend",
     title: `Proposal ${params.proposalId} deliberation`,
     description: params.proposalContext,
@@ -202,13 +247,17 @@ export async function runOrchestratedDeliberation(params: {
   const task = makeTask({ companyId, proposalId, proposalType, proposalContext });
   const evidence = buildEvidence(companyContext);
 
-  // 2. Select agents contextually
+  // 2. Select agents via canonical routing
+  const taskType = normalizeTaskType(proposalType);
   const selected = selectAgents(proposalType, budget);
-  const excluded = AGENTS.filter(a => !selected.find(s => s.agent.role === a.role));
+  const taskScopedAgents = getCanonicalAgentsByTask(taskType);
+  const excluded = taskScopedAgents.filter(
+    a => !selected.find(s => s.agent.id === a.id),
+  );
   const routingTrace = {
-    reason: `Proposal type "${proposalType}" with budget ${budget ?? "unspecified"}. Selected ${selected.length} agents with weight ≥ threshold.`,
-    agentsSelected: selected.map(s => `${s.agent.name} (w:${s.weight.toFixed(2)})`),
-    agentsExcluded: excluded.map(e => e.name),
+    reason: `Task type "${taskType}" (from "${proposalType}"), budget ${budget ?? "unspecified"}. Selected ${selected.length} canonical agents above weight threshold.`,
+    agentsSelected: selected.map(s => `${s.agent.name} [${s.agent.id}] (w:${s.weight.toFixed(2)})`),
+    agentsExcluded: excluded.map(e => `${e.name} [${e.id}]`),
   };
 
   // 3. Create deliberation record
@@ -374,7 +423,7 @@ export async function runOrchestratedDeliberation(params: {
     riskScore: averageRisk,
     requiresHumanApproval: true,
     executionAllowed: false,
-    selectedAgents: selected.map(s => s.agent.role),
+    selectedAgents: selected.map(s => s.agent.id),
     dissentSummary: dissentSummary.map(d => `${d.agentName}: ${d.concern}`),
     evidence,
     createdAt: nowIso(),
@@ -401,7 +450,7 @@ export async function runOrchestratedDeliberation(params: {
       scope: "agent_interaction",
       key: `proposal_${proposalId}_deliberation_summary`,
       value: {
-        selectedAgents: selected.map(s => s.agent.role),
+        selectedAgents: selected.map(s => s.agent.id),
         dissentCount: dissenters.length,
         rounds: allRounds.length,
       },
@@ -421,7 +470,7 @@ export async function runOrchestratedDeliberation(params: {
     proposalId, companyId,
     deliberationId: deliberation.id,
     rounds: allRounds,
-    selectedAgents: selected.map(s => ({ role: s.agent.role, name: s.agent.name, weight: s.weight })),
+    selectedAgents: selected.map(s => ({ role: s.agent.id, name: s.agent.name, weight: s.weight })),
     weightedConsensusScore,
     dissentSummary,
     finalRecommendation,
