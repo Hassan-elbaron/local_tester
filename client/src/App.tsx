@@ -33,6 +33,8 @@ import CustomersPage from "./pages/CustomersPage";
 import BehaviorPage from "./pages/BehaviorPage";
 import PredictionsPage from "./pages/PredictionsPage";
 import DecisionsPage from "./pages/DecisionsPage";
+import RunsPage from "./pages/RunsPage";
+import RunDetailPage from "./pages/RunDetailPage";
 import { getLoginUrl } from "./const";
 import { Button } from "@/components/ui/button";
 import { Brain, Loader2 } from "lucide-react";
@@ -114,6 +116,8 @@ function Router() {
       <Route path="/behavior" component={BehaviorPage} />
       <Route path="/predictions" component={PredictionsPage} />
       <Route path="/decisions" component={DecisionsPage} />
+      <Route path="/runs" component={RunsPage} />
+      <Route path="/runs/:taskId" component={RunDetailPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

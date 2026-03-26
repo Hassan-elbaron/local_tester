@@ -21,7 +21,9 @@ export interface LedgerRow {
   companyId: number;
   proposalId: number | null;
   taskId: string;
+  actionType: string;
   status: string;
+  executor: string;
   summary: string;
   externalRef: string | null;
   run: BrainRunResult | null;
@@ -42,7 +44,9 @@ function rowToLedger(row: typeof executionLogs.$inferSelect): LedgerRow {
     companyId:   row.companyId,
     proposalId:  row.proposalId ?? null,
     taskId:      row.taskId,
+    actionType:  row.actionType,
     status:      row.status,
+    executor:    row.executor,
     summary:     row.summary,
     externalRef: row.externalRef ?? null,
     run:         toRun(row.payload),
