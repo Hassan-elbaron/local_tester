@@ -337,114 +337,66 @@ const WEBHOOK_EXECUTION_TYPES  = new Set(["optimization"]);   // → generic web
 const SENDGRID_EXECUTION_TYPES = new Set(["support", "community"]);  // → SendGrid v3 API
 
 function buildExecutionRequest(params: {
-  companyId:       number;
-  proposalId:      number;
-  taskId:          string;
-  decision:        BrainDecision;
-  proposalType:    string;
-  proposalContext: string;
+  companyId:         number;
+  proposalId:        number;
+  taskId:            string;
+  decision:          BrainDecision;
+  proposalType:      string;
+  proposalContext:   string;
+  executionMetadata?: Record<string, unknown>;
 }): BrainExecutionRequest {
   const taskType = normalizeTaskType(params.proposalType);
+  const meta = params.executionMetadata;
 
   // ── SendGrid connector: support tasks ─────────────────────────────────────
   if (SENDGRID_EXECUTION_TYPES.has(taskType)) {
     return {
-      companyId:  params.companyId,
-      proposalId: params.proposalId,
-      taskId:     params.taskId,
-      decision:   params.decision,
-      mode:       "external",
-      target:     "sendgrid_email",
-      payload: {
-        to:      process.env.TEAM_EMAIL ?? "team@example.com",
-        subject: `AI Marketing — ${taskType} action required`,
-        body:    params.proposalContext,
-      },
+      companyId: params.companyId, proposalId: params.proposalId,
+      taskId: params.taskId, decision: params.decision,
+      mode: "external", target: "sendgrid_email",
+      payload: buildSupportExecutionPayload(params.proposalContext, params.decision, meta),
     };
   }
 
-  // ── CRM connector: community tasks ─────────────────────────────────────
+  // ── CRM connector: community tasks ────────────────────────────────────────
   if (CRM_EXECUTION_TYPES.has(taskType)) {
-    const brandLine = params.proposalContext.split("\n").find(l => l.startsWith("Brand:"));
-    const brandName = brandLine ? brandLine.replace(/^Brand:\s*/i, "").trim() : "Unknown";
     return {
-      companyId:  params.companyId,
-      proposalId: params.proposalId,
-      taskId:     params.taskId,
-      decision:   params.decision,
-      mode:       "external",
-      target:     "crm",
-      payload: {
-        action:  "create_lead",
-        name:    "Community Lead",
-        company: brandName,
-        note:    params.proposalContext.slice(0, 1000),
-        metadata: {
-          source:       "ai_marketing_brain_os",
-          proposalType: "community",
-          taskId:       params.taskId,
-        },
-      },
+      companyId: params.companyId, proposalId: params.proposalId,
+      taskId: params.taskId, decision: params.decision,
+      mode: "external", target: "crm",
+      payload: buildCommunityExecutionPayload(params.proposalContext, params.decision, meta),
     };
   }
 
-  // ── Meta Ads connector: campaign tasks ─────────────────────────────────
+  // ── Meta Ads connector: campaign tasks ────────────────────────────────────
   if (META_ADS_EXECUTION_TYPES.has(taskType)) {
     return {
-      companyId:  params.companyId,
-      proposalId: params.proposalId,
-      taskId:     params.taskId,
-      decision:   params.decision,
-      mode:       "external",
-      target:     "meta_ads",
-      payload: {
-        proposalType:    params.proposalType,
-        proposalContext: params.proposalContext,
-      },
+      companyId: params.companyId, proposalId: params.proposalId,
+      taskId: params.taskId, decision: params.decision,
+      mode: "external", target: "meta_ads",
+      payload: buildCampaignExecutionPayload(params.proposalContext, params.decision, meta),
     };
   }
 
-  // ── CMS connector: content tasks ────────────────────────────────────────
+  // ── CMS connector: content tasks ──────────────────────────────────────────
   if (CMS_EXECUTION_TYPES.has(taskType)) {
-    const brandLine = params.proposalContext.split("\n").find(l => l.startsWith("Brand:"));
-    const brandName = brandLine ? brandLine.replace(/^Brand:\s*/i, "").trim() : "Unknown";
     return {
-      companyId:  params.companyId,
-      proposalId: params.proposalId,
-      taskId:     params.taskId,
-      decision:   params.decision,
-      mode:       "external",
-      target:     "cms",
-      payload: {
-        action:  "create_draft",
-        title:   `${brandName} Content Draft`,
-        content: params.proposalContext.slice(0, 5000),
-        status:  "draft",
-        metadata: {
-          source:       "ai_marketing_brain_os",
-          proposalType: "content",
-          taskId:       params.taskId,
-        },
-      },
+      companyId: params.companyId, proposalId: params.proposalId,
+      taskId: params.taskId, decision: params.decision,
+      mode: "external", target: "cms",
+      payload: buildContentExecutionPayload(params.proposalContext, params.decision, meta),
     };
   }
 
-  // ── Webhook connector: optimization ─────────────────────────────────────
+  // ── Webhook connector: optimization ───────────────────────────────────────
   if (WEBHOOK_EXECUTION_TYPES.has(taskType)) {
     return {
-      companyId:  params.companyId,
-      proposalId: params.proposalId,
-      taskId:     params.taskId,
-      decision:   params.decision,
-      mode:       "external",
-      target:     "webhook",
-      payload: {
-        proposalType:    params.proposalType,
-        proposalContext: params.proposalContext,
-      },
+      companyId: params.companyId, proposalId: params.proposalId,
+      taskId: params.taskId, decision: params.decision,
+      mode: "external", target: "webhook",
+      payload: buildOptimizationExecutionPayload(params.proposalContext, params.decision, meta),
     };
   }
-
   // ── Internal no-op: strategy / research / analytics / etc. ───────────────
   return {
     companyId:  params.companyId,
@@ -467,8 +419,9 @@ export async function runOrchestratedDeliberation(params: {
   proposalType: string;
   proposalContext: string;
   budget?: number;
+  executionMetadata?: Record<string, unknown>;
 }): Promise<OrchestratedDeliberationResult> {
-  const { proposalId, companyId, proposalType, proposalContext, budget } = params;
+  const { proposalId, companyId, proposalType, proposalContext, budget, executionMetadata } = params;
 
   // ── System Guards (pre-flight) ────────────────────────────────────────────
   // 1a. Duplicate run guard — block if this proposal already has a brain_run ledger entry
@@ -824,6 +777,7 @@ export async function runOrchestratedDeliberation(params: {
     decision: brainDecision,
     proposalType,
     proposalContext,
+    executionMetadata,
   });
 
   const gate = validateExecutionGate(brainDecision, executionRequest);

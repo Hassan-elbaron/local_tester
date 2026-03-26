@@ -89,6 +89,14 @@ export const optimizationLoopRouter = router({
         companyId:       input.companyId,
         proposalType:    "optimization",
         proposalContext,
+        executionMetadata: {
+          brandName:          input.brandName,
+          optimizationGoal:   input.optimizationGoal,
+          currentPerformance: input.currentPerformance,
+          bottlenecks:        input.bottlenecks,
+          channels:           input.channels,
+          notes:              input.notes,
+        },
       });
 
       // 4. Return same shape as all previous flows

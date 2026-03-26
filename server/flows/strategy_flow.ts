@@ -86,6 +86,13 @@ export const strategyFlowRouter = router({
         companyId:       input.companyId,
         proposalType:    "strategy",
         proposalContext,
+        executionMetadata: {
+          brandName:      input.brandName,
+          businessGoal:   input.businessGoal,
+          industry:       input.industry,
+          channels:       input.channels,
+          notes:          input.notes,
+        },
       });
 
       // 4. Return same shape as brandAudit.run

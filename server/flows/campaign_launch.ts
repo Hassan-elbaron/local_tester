@@ -91,6 +91,15 @@ export const campaignLaunchRouter = router({
         companyId:       input.companyId,
         proposalType:    "campaign",
         proposalContext,
+        executionMetadata: {
+          brandName:    input.brandName,
+          campaignGoal: input.campaignGoal,
+          audience:     input.audience,
+          budget:       input.budget,
+          channels:     input.channels,
+          offer:        input.offer,
+          timeline:     input.timeline,
+        },
       });
 
       // 4. Return same shape as brandAudit.run and strategyFlow.run

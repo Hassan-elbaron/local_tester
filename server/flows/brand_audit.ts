@@ -80,6 +80,11 @@ export const brandAuditRouter = router({
         companyId:       input.companyId,
         proposalType:    "research",
         proposalContext,
+        executionMetadata: {
+          brandName:      input.brandName,
+          industry:       input.industry,
+          targetAudience: input.targetAudience,
+        },
       });
 
       // 4. Return everything the UI needs

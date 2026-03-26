@@ -91,6 +91,14 @@ export const contentCalendarRouter = router({
         companyId:       input.companyId,
         proposalType:    "content",
         proposalContext,
+        executionMetadata: {
+          brandName:        input.brandName,
+          contentGoal:      input.contentGoal,
+          channels:         input.channels,
+          contentPillars:   input.contentPillars,
+          postingFrequency: input.postingFrequency,
+          notes:            input.notes,
+        },
       });
 
       // 4. Return same shape as brandAudit.run / strategyFlow.run / campaignLaunch.run
