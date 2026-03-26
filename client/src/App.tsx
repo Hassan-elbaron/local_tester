@@ -40,6 +40,7 @@ import ExecutionsPage from "./pages/ExecutionsPage";
 import ExecutionDetailPage from "./pages/ExecutionDetailPage";
 import MemoryPage from "./pages/MemoryPage";
 import MemoryDetailPage from "./pages/MemoryDetailPage";
+import ObservabilityPage from "./pages/ObservabilityPage";
 import { getLoginUrl } from "./const";
 import { Button } from "@/components/ui/button";
 import { Brain, Loader2 } from "lucide-react";
@@ -128,6 +129,7 @@ function Router() {
       <Route path="/executions/:taskId" component={ExecutionDetailPage} />
       <Route path="/memory" component={MemoryPage} />
       <Route path="/memory/:key" component={MemoryDetailPage} />
+      <Route path="/observability" component={ObservabilityPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
