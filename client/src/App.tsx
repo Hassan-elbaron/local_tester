@@ -35,6 +35,7 @@ import PredictionsPage from "./pages/PredictionsPage";
 import DecisionsPage from "./pages/DecisionsPage";
 import RunsPage from "./pages/RunsPage";
 import RunDetailPage from "./pages/RunDetailPage";
+import BrainApprovalsPage from "./pages/BrainApprovalsPage";
 import { getLoginUrl } from "./const";
 import { Button } from "@/components/ui/button";
 import { Brain, Loader2 } from "lucide-react";
@@ -118,6 +119,7 @@ function Router() {
       <Route path="/decisions" component={DecisionsPage} />
       <Route path="/runs" component={RunsPage} />
       <Route path="/runs/:taskId" component={RunDetailPage} />
+      <Route path="/brain-approvals" component={BrainApprovalsPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

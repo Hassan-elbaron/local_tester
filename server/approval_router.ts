@@ -19,6 +19,9 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "./_core/trpc";
 import { recordApproval, getLatestApproval } from "./approval_service";
+import { getDb } from "./db";
+import { executionLogs } from "../drizzle/schema";
+import { and, desc, eq } from "drizzle-orm";
 
 const approvalInputSchema = z.object({
   taskId:     z.string().min(1),
@@ -115,5 +118,47 @@ export const approvalRouter = router({
         taskId:   input.taskId,
         record,
       };
+    }),
+
+  /**
+   * List all brain runs that are pending human approval.
+   * These are execution_logs rows where actionType="brain_run" and status="planned"
+   * (pending_approval decisions are stored as "planned" per resolveLogStatus mapping).
+   */
+  pendingApprovals: protectedProcedure
+    .input(z.object({ companyId: z.number().int().positive() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { items: [] };
+
+      const rows = await db
+        .select()
+        .from(executionLogs)
+        .where(
+          and(
+            eq(executionLogs.companyId,  input.companyId),
+            eq(executionLogs.actionType, "brain_run"),
+            eq(executionLogs.status,     "planned"),
+          ),
+        )
+        .orderBy(desc(executionLogs.createdAt))
+        .limit(50);
+
+      const items = rows.map(row => {
+        const payload = row.payload as Record<string, unknown>;
+        const decision = payload["decision"] as Record<string, unknown> | null ?? {};
+        return {
+          id:             row.id,
+          taskId:         row.taskId,
+          proposalId:     row.proposalId ?? null,
+          recommendation: String(decision["recommendation"] ?? row.summary ?? ""),
+          confidence:     typeof decision["confidence"] === "number" ? decision["confidence"] : null,
+          riskScore:      typeof decision["riskScore"]   === "number" ? decision["riskScore"]   : null,
+          autonomyLevel:  (decision["reason"] as string ?? "").match(/Autonomy:\s*(\w+)/)?.[1] ?? null,
+          createdAt:      row.createdAt,
+        };
+      });
+
+      return { items };
     }),
 });
