@@ -345,7 +345,7 @@ function buildExecutionRequest(params: {
 }): BrainExecutionRequest {
   const taskType = normalizeTaskType(params.proposalType);
 
-  // ── Email connector: support + community tasks ─────────────────────────────
+  // ── SendGrid connector: support tasks ─────────────────────────────────────
   if (SENDGRID_EXECUTION_TYPES.has(taskType)) {
     return {
       companyId:  params.companyId,
@@ -358,6 +358,31 @@ function buildExecutionRequest(params: {
         to:      process.env.TEAM_EMAIL ?? "team@example.com",
         subject: `AI Marketing — ${taskType} action required`,
         body:    params.proposalContext,
+      },
+    };
+  }
+
+  // ── CRM connector: community tasks ─────────────────────────────────────
+  if (CRM_EXECUTION_TYPES.has(taskType)) {
+    const brandLine = params.proposalContext.split("\n").find(l => l.startsWith("Brand:"));
+    const brandName = brandLine ? brandLine.replace(/^Brand:\s*/i, "").trim() : "Unknown";
+    return {
+      companyId:  params.companyId,
+      proposalId: params.proposalId,
+      taskId:     params.taskId,
+      decision:   params.decision,
+      mode:       "external",
+      target:     "crm",
+      payload: {
+        action:  "create_lead",
+        name:    "Community Lead",
+        company: brandName,
+        note:    params.proposalContext.slice(0, 1000),
+        metadata: {
+          source:       "ai_marketing_brain_os",
+          proposalType: "community",
+          taskId:       params.taskId,
+        },
       },
     };
   }

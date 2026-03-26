@@ -25,6 +25,7 @@ import { WebhookExecutionAdapter } from "./execution_adapters/webhook_adapter";
 import { EmailExecutionAdapter } from "./execution_adapters/email_adapter";
 import { MetaAdsExecutionAdapter } from "./execution_adapters/meta_ads_adapter";
 import { SendGridEmailExecutionAdapter } from "./execution_adapters/sendgrid_email_adapter";
+import { CrmExecutionAdapter } from "./execution_adapters/crm_adapter";
 
 // ─── External Result (from adapter) ──────────────────────────────────────────
 export interface ExternalExecutionResult {
@@ -71,8 +72,9 @@ export class InternalNoopAdapter implements ExecutionAdapter {
 // Adapters are checked in order — first canHandle() match wins.
 // Typed connectors (email) are checked before the generic webhook fallback.
 const EXECUTION_ADAPTERS: ExecutionAdapter[] = [
-  new MetaAdsExecutionAdapter(),        // real: campaign tasks → Meta Ads Graph API
-  new SendGridEmailExecutionAdapter(),   // real: support / community → SendGrid v3
+  new MetaAdsExecutionAdapter(),        // real: campaign    → Meta Ads Graph API
+  new SendGridEmailExecutionAdapter(),   // real: support     → SendGrid v3 API
+  new CrmExecutionAdapter(),             // real: community   → CRM webhook bridge
   new EmailExecutionAdapter(),           // legacy: email webhook fallback
   new WebhookExecutionAdapter(),         // generic: content / optimization
   new InternalNoopAdapter(),             // fallback: all other internal tasks
