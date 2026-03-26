@@ -9,6 +9,25 @@
  */
 
 import { invokeLLM } from "./_core/llm";
+import { invokeRoutedLLM } from "./model_router";
+import { decideAutonomy } from "./autonomy_policy";
+import { persistBrainRunLedger } from "./decision_ledger";
+import { validateExecutionGate } from "./execution_gate";
+import {
+  runExecutionWithReceipt,
+  persistExecutionReceipt,
+} from "./execution_receipts";
+import {
+  buildHybridMemoryContext,
+  extractLearningFromRun,
+  writeHybridMemories,
+} from "./hybrid_memory";
+import {
+  AgentInputEnvelope,
+  AgentOutputEnvelope,
+  validateAgentOutput,
+  AGENT_JSON_INSTRUCTION,
+} from "./agent_protocol";
 import { AgentOpinionResult } from "./agents";
 import {
   CANONICAL_AGENTS,
@@ -22,9 +41,11 @@ import {
   BrainTask,
   BrainDecision,
   BrainEvidence,
+  BrainExecutionRequest,
   BrainRunResult,
   BrainTaskType,
   DeliberationBundle,
+  ExecutionReceipt,
   MemoryWriteRequest,
 } from "./orchestration_contract";
 
@@ -131,6 +152,36 @@ function selectAgents(
     .sort((a, b) => b.weight - a.weight);
 }
 
+// ─── Fallback opinion (validation failure / parse error) ─────────────────────
+function fallbackOpinion(
+  agent: CanonicalAgent,
+  weight: number,
+  round: DeliberationRound,
+  reason: string,
+): OrchestratedOpinion {
+  return {
+    agentRole:       agent.id,
+    agentName:       agent.name,
+    opinion:         `Structured response invalid: ${reason}`,
+    opinionAr:       "",
+    recommendation:  "needs_revision",
+    confidence:      0.2,
+    risk:            0.8,
+    concerns:        [reason],
+    suggestions:     ["Fix agent output format before re-deliberation"],
+    votedFor:        false,
+    routing: {
+      provider:      "local",
+      reasons:       ["structured_json"],
+      policyVersion: "offline-first-v1",
+    },
+    weight,
+    weightedScore:   0,
+    round,
+    dissent:         false, // recalculated after round
+  };
+}
+
 // ─── Single Agent Opinion (one round) ────────────────────────────────────────
 async function getOpinion(
   agent: CanonicalAgent,
@@ -139,51 +190,96 @@ async function getOpinion(
   proposalContext: string,
   companyContext: string,
   previousSummary: string,
+  taskType: BrainTaskType,
 ): Promise<OrchestratedOpinion> {
   const roundInstructions: Record<DeliberationRound, string> = {
     proposal: "Provide your initial professional assessment of this proposal.",
     critique: "Critically evaluate the proposal. Focus on risks, gaps, and weaknesses. Be direct.",
     revision: "Based on the critique round, suggest specific improvements and revised approach.",
-    scoring: "Score this proposal on: feasibility (0-10), impact (0-10), risk (0-10 where 10=high risk), alignment (0-10). Provide final vote.",
-    final: "Give your final weighted recommendation considering all previous rounds.",
+    scoring:  "Score this proposal — set confidence and risk carefully.",
+    final:    "Give your final weighted recommendation considering all previous rounds.",
   };
 
-  const prompt = `COMPANY CONTEXT:\n${companyContext}\n\nPROPOSAL:\n${proposalContext}\n\n${previousSummary ? `PREVIOUS ROUND SUMMARY:\n${previousSummary}\n\n` : ""}ROUND: ${round.toUpperCase()}\nINSTRUCTION: ${roundInstructions[round]}\n\nYour domain weight for this decision type: ${weight.toFixed(2)} (higher = more relevant expertise)\n\nRespond ONLY with valid JSON:\n{\n  "opinion": "2-3 paragraph professional assessment",\n  "recommendation": "One clear sentence",\n  "confidence": 0.85,\n  "concerns": ["concern 1", "concern 2"],\n  "suggestions": ["suggestion 1", "suggestion 2"],\n  "votedFor": true,\n  "dissent_reason": "Only if votedFor=false: explain your dissent clearly"\n}`;
+  // ── Build typed input envelope ──
+  const inputEnvelope: AgentInputEnvelope = {
+    taskId:  `${agent.id}_${round}_${Date.now()}`,
+    agentId: agent.id,
+    context: {
+      proposal: [
+        `COMPANY CONTEXT:\n${companyContext}`,
+        `PROPOSAL:\n${proposalContext}`,
+        previousSummary ? `PREVIOUS ROUND SUMMARY:\n${previousSummary}` : "",
+        `ROUND: ${round.toUpperCase()}`,
+        `INSTRUCTION: ${roundInstructions[round]}`,
+        `Your domain weight for this decision type: ${weight.toFixed(2)} (higher = more relevant expertise)`,
+      ].filter(Boolean).join("\n\n"),
+    },
+    instructions: roundInstructions[round],
+  };
 
   try {
-    const res = await invokeLLM({
+    const res = await invokeRoutedLLM({
       messages: [
-        { role: "system", content: agent.systemPrompt },
-        { role: "user", content: prompt },
+        {
+          role: "system",
+          content: agent.systemPrompt + AGENT_JSON_INSTRUCTION,
+        },
+        {
+          role: "user",
+          content: JSON.stringify(inputEnvelope, null, 2),
+        },
       ],
+      agentId:              agent.id,
+      taskType,
+      action:               "recommend",
+      stage:                "deliberation",
+      temperature:          0.2,
+      requiresStructuredJson: true,
+      isHighRisk:
+        agent.id === "compliance" ||
+        agent.id === "budget"     ||
+        agent.id === "watchman",
     });
-    const content = (res.choices?.[0]?.message?.content ?? "") as string;
-    const clean = content.replace(/```json\n?|\n?```/g, "").trim();
-    const parsed = JSON.parse(clean);
+
+    // ── Parse raw LLM response ──
+    const rawContent = (res.choices?.[0]?.message?.content ?? "") as string;
+    const clean = rawContent.replace(/```json\n?|\n?```/g, "").trim();
+
+    let rawParsed: unknown;
+    try {
+      rawParsed = JSON.parse(clean);
+    } catch {
+      return fallbackOpinion(agent, weight, round, "LLM response is not valid JSON");
+    }
+
+    // ── Validate envelope ──
+    const validation = validateAgentOutput(rawParsed);
+    if (!validation.valid || !validation.output) {
+      return fallbackOpinion(agent, weight, round, validation.reason ?? "invalid structure");
+    }
+
+    const parsed: AgentOutputEnvelope = validation.output;
+    const approved = parsed.recommendation === "approve";
+
     return {
-      agentRole: agent.id,
-      agentName: agent.name,
-      opinion: parsed.opinion ?? "",
-      opinionAr: "",
-      recommendation: parsed.recommendation ?? "",
-      confidence: Math.min(1, Math.max(0, parsed.confidence ?? 0.7)),
-      concerns: parsed.concerns ?? [],
-      suggestions: parsed.suggestions ?? [],
-      votedFor: parsed.votedFor ?? true,
+      agentRole:      agent.id,
+      agentName:      agent.name,
+      opinion:        parsed.opinion,
+      opinionAr:      "",
+      recommendation: parsed.recommendation,
+      confidence:     parsed.confidence,
+      risk:           parsed.risk,
+      concerns:       parsed.concerns,
+      suggestions:    parsed.suggestions,
+      votedFor:       approved,
+      routing:        res.routing,
       weight,
-      weightedScore: (parsed.votedFor ? 1 : 0) * weight,
+      weightedScore:  (approved ? 1 : 0) * weight,
       round,
-      dissent: false, // set after all opinions collected
+      dissent:        false, // recalculated after all opinions are collected
     };
   } catch {
-    return {
-      agentRole: agent.id, agentName: agent.name,
-      opinion: "Unable to generate opinion at this time.",
-      opinionAr: "", recommendation: "Proceed with caution.",
-      confidence: 0.5, concerns: [], suggestions: [],
-      votedFor: true, weight, weightedScore: weight * 0.5,
-      round, dissent: false,
-    };
+    return fallbackOpinion(agent, weight, round, "Unexpected error during agent invocation");
   }
 }
 
@@ -226,6 +322,35 @@ function buildEvidence(companyContext: string): BrainEvidence[] {
   ];
 }
 
+// Proposal types that trigger external execution via the webhook adapter.
+// All other types fall back to internal (no-op) execution.
+const EXTERNAL_EXECUTION_TYPES = new Set(["campaign", "content", "optimization"]);
+
+function buildExecutionRequest(params: {
+  companyId: number;
+  proposalId: number;
+  taskId: string;
+  decision: BrainDecision;
+  proposalType: string;
+  proposalContext: string;
+}): BrainExecutionRequest {
+  const taskType = normalizeTaskType(params.proposalType);
+  const isExternal = EXTERNAL_EXECUTION_TYPES.has(taskType);
+
+  return {
+    companyId:  params.companyId,
+    proposalId: params.proposalId,
+    taskId:     params.taskId,
+    decision:   params.decision,
+    mode:       isExternal ? "external" : "internal",
+    target:     isExternal ? "webhook"  : "internal",
+    payload: {
+      proposalType:    params.proposalType,
+      proposalContext: params.proposalContext,
+    },
+  };
+}
+
 // ─── Main Orchestrated Deliberation ──────────────────────────────────────────
 export async function runOrchestratedDeliberation(params: {
   proposalId: number;
@@ -243,9 +368,27 @@ export async function runOrchestratedDeliberation(params: {
   ]);
   const companyContext = `${knowledgeCtx}\n\n${intelligenceCtx}`;
 
-  // 1b. Build orchestration task envelope + evidence
+  // 1b. Build orchestration task envelope
   const task = makeTask({ companyId, proposalId, proposalType, proposalContext });
-  const evidence = buildEvidence(companyContext);
+
+  // 1c. Retrieve hybrid memory context (ranked from prior decisions/learnings/executions)
+  const hybridMemory = await buildHybridMemoryContext({ companyId, task });
+
+  // 1d. Build evidence array (company context + hybrid memory)
+  const evidence: BrainEvidence[] = [
+    ...buildEvidence(companyContext),
+    {
+      source: "memory" as const,
+      key: "hybrid_memory_context",
+      summary: "Hybrid memory context assembled from ranked structured memory",
+      payload: hybridMemory.topMemories,
+    },
+  ];
+
+  // 1e. Enrich proposal context with relevant memory before deliberation
+  const enrichedProposalContext = hybridMemory.assembledContext.length > 0
+    ? [proposalContext, "", "Hybrid Memory Context:", hybridMemory.assembledContext].join("\n")
+    : proposalContext;
 
   // 2. Select agents via canonical routing
   const taskType = normalizeTaskType(proposalType);
@@ -275,7 +418,7 @@ export async function runOrchestratedDeliberation(params: {
   for (const round of ROUNDS) {
     const opinions = await Promise.all(
       selected.map(({ agent, weight }) =>
-        getOpinion(agent, weight, round, proposalContext, companyContext, previousSummary)
+        getOpinion(agent, weight, round, enrichedProposalContext, companyContext, previousSummary, taskType)
       )
     );
 
@@ -383,11 +526,14 @@ export async function runOrchestratedDeliberation(params: {
   };
 
   // ─── Build canonical BrainRunResult ────────────────────────────────────────
+  // Use structured risk score from agent envelope when available;
+  // fall back to derived (1 - confidence) when not.
   const averageRisk =
     lastRound.length > 0
       ? lastRound.reduce((sum, op) => {
-          const localRisk = Math.max(0, 1 - op.confidence) + (op.dissent ? 0.25 : 0);
-          return sum + Math.min(1, localRisk);
+          const structuredRisk = typeof op.risk === "number" ? op.risk : null;
+          const derivedRisk = Math.max(0, 1 - op.confidence) + (op.dissent ? 0.25 : 0);
+          return sum + Math.min(1, structuredRisk ?? derivedRisk);
         }, 0) / lastRound.length
       : 0.5;
 
@@ -395,16 +541,28 @@ export async function runOrchestratedDeliberation(params: {
     task,
     round: "final",
     assessments: lastRound.map(op => ({
-      agentId: op.agentRole,
-      agentRole: op.agentRole,
-      opinion: op.opinion,
+      agentId:        op.agentRole,
+      agentRole:      op.agentRole,
+      opinion:        op.opinion,
       recommendation: op.recommendation,
-      confidence: op.confidence,
-      riskScore: Math.min(1, Math.max(0, 1 - op.confidence)),
-      votedFor: op.votedFor,
-      concerns: op.concerns,
-      suggestions: op.suggestions,
-      evidence: [],
+      confidence:     op.confidence,
+      // Prefer structured risk from envelope; fall back to derived value
+      riskScore: typeof op.risk === "number"
+        ? Math.min(1, Math.max(0, op.risk))
+        : Math.min(1, Math.max(0, 1 - op.confidence)),
+      votedFor:       op.votedFor,
+      concerns:       op.concerns,
+      suggestions:    op.suggestions,
+      evidence: op.routing
+        ? [
+            {
+              source: "system" as const,
+              key: "model_routing",
+              summary: `Provider: ${op.routing.provider} | Reasons: ${op.routing.reasons.join(", ")} | Policy: v${op.routing.policyVersion}`,
+              payload: op.routing,
+            },
+          ]
+        : [],
     })),
     weightedConsensus: weightedConsensusScore,
     averageConfidence: avgConfidence,
@@ -412,22 +570,42 @@ export async function runOrchestratedDeliberation(params: {
     dissentCount: dissenters.length,
   };
 
+  // ── Autonomy Policy ─────────────────────────────────────────────────────────
+  const autonomy = decideAutonomy({
+    task,
+    confidence: avgConfidence,
+    riskScore:  averageRisk,
+  });
+
   const brainDecision: BrainDecision = {
     companyId,
     proposalId,
     taskId: task.id,
-    status: escalated ? "needs_revision" : "pending_approval",
+    status: escalated ? "needs_revision" : (autonomy.requiresHumanApproval ? "pending_approval" : "approved"),
     recommendation: finalRecommendation,
-    reason: summary,
+    reason: `${summary}\nAutonomy: ${autonomy.level} — ${autonomy.reasoning}`,
     confidence: avgConfidence,
     riskScore: averageRisk,
-    requiresHumanApproval: true,
-    executionAllowed: false,
+    requiresHumanApproval: autonomy.requiresHumanApproval,
+    executionAllowed: autonomy.executionAllowed,
     selectedAgents: selected.map(s => s.agent.id),
     dissentSummary: dissentSummary.map(d => `${d.agentName}: ${d.concern}`),
     evidence,
     createdAt: nowIso(),
   };
+
+  // Collect routing stats across all final-round opinions
+  const routingStats = lastRound.reduce(
+    (acc, op) => {
+      if (op.routing) {
+        acc.cloud += op.routing.provider === "cloud" ? 1 : 0;
+        acc.local += op.routing.provider === "local" ? 1 : 0;
+        op.routing.reasons.forEach(r => acc.reasons.add(r));
+      }
+      return acc;
+    },
+    { cloud: 0, local: 0, reasons: new Set<string>() },
+  );
 
   const memoryWrites: MemoryWriteRequest[] = [
     {
@@ -457,14 +635,107 @@ export async function runOrchestratedDeliberation(params: {
       confidence: weightedConsensusScore,
       source: "orchestrator",
     },
+    {
+      companyId,
+      scope: "agent_interaction",
+      key: `proposal_${proposalId}_model_policy_trace`,
+      value: lastRound.map(op => ({
+        agentRole: op.agentRole,
+        agentName: op.agentName,
+        provider: op.routing?.provider ?? "unknown",
+        reasons: op.routing?.reasons ?? [],
+        policyVersion: op.routing?.policyVersion ?? "offline-first-v1",
+      })),
+      confidence: 1,
+      source: "model_router",
+    },
+    {
+      companyId,
+      scope: "decision",
+      key: `proposal_${proposalId}_autonomy`,
+      value: autonomy,
+      confidence: 1,
+      source: "autonomy_policy",
+    },
   ];
+
+  // ─── Execution Gate + Receipt ───────────────────────────────────────────────
+  // brainDecision.executionAllowed is false by design (human-in-the-loop).
+  // The gate will block execution and produce a "blocked" receipt — this is
+  // the correct behaviour: every deliberation ends with a receipt, and the
+  // receipt records *why* execution was not initiated.
+  const executionRequest = buildExecutionRequest({
+    companyId,
+    proposalId,
+    taskId: task.id,
+    decision: brainDecision,
+    proposalType,
+    proposalContext,
+  });
+
+  const gate = validateExecutionGate(brainDecision, executionRequest);
+
+  let execution: ExecutionReceipt | undefined;
+  let executionMemoryWrite: MemoryWriteRequest | undefined;
+
+  if (!gate.allowed) {
+    execution = {
+      executor: "execution_gate",
+      status: "blocked",
+      summary: gate.reason,
+      payload: {
+        proposalId,
+        taskId: task.id,
+        target: executionRequest.target,
+        decisionStatus: brainDecision.status,
+      },
+      executedAt: nowIso(),
+    };
+    executionMemoryWrite = {
+      companyId,
+      scope: "execution",
+      key: `task_${task.id}_receipt`,
+      value: execution,
+      confidence: 1,
+      source: "execution_gate",
+    };
+  } else {
+    const executed = await runExecutionWithReceipt(executionRequest);
+    execution = executed.receipt;
+    executionMemoryWrite = executed.memoryWrite;
+    await persistExecutionReceipt({
+      companyId,
+      proposalId,
+      taskId: task.id,
+      decision: brainDecision,
+      request: executionRequest,
+      receipt: execution,
+    });
+  }
 
   const brainRun: BrainRunResult = {
     task,
     deliberation: deliberationBundle,
     decision: brainDecision,
-    memoryWrites,
+    execution,
+    memoryWrites: executionMemoryWrite
+      ? [...memoryWrites, executionMemoryWrite]
+      : memoryWrites,
   };
+
+  // ─── Learning Extraction + Hybrid Memory Persist ────────────────────────────
+  const learningWrites = extractLearningFromRun({
+    task,
+    decision: brainDecision,
+    execution,
+  });
+  const finalMemoryWrites = [...brainRun.memoryWrites, ...learningWrites];
+  await writeHybridMemories(finalMemoryWrites);
+
+  // ─── Decision Ledger snapshot ────────────────────────────────────────────────
+  // Persists a single atomic row with full run context for audit + replayability.
+  // Non-fatal — failure is logged but does not abort the return value.
+  await persistBrainRunLedger(brainRun);
 
   return {
     proposalId, companyId,

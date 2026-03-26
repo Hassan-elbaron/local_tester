@@ -164,3 +164,13 @@ export async function recordAgentInteraction(params: {
     confidence: params.weightedConsensus,
   });
 }
+
+// ─── Hybrid Memory Façade ─────────────────────────────────────────────────────
+// Re-export hybrid memory functions so all memory access flows through this
+// module — prevents scattered memory system imports across the codebase.
+export {
+  writeHybridMemory,
+  writeHybridMemories,
+  retrieveHybridMemory,
+  buildHybridMemoryContext,
+} from "./hybrid_memory";

@@ -75,6 +75,10 @@ import {
 import {
   processCommandMessage, getCommandHistory, saveCommandMessage,
 } from "./command_center";
+import { approvalRouter } from "./approval_router";
+import { runExecutionWithReceipt, persistExecutionReceipt } from "./execution_receipts";
+import { validateExecutionGate } from "./execution_gate";
+import { getLatestBrainRun, getBrainRunHistory } from "./replay_service";
 import {
   STRATEGY_SECTIONS,
   snapshotStrategy,
@@ -304,6 +308,7 @@ const proposalsRouter = router({
         escalated: result.escalated,
         decisionTrace: result.decisionTrace,
         brainRun: result.brainRun,
+        execution: result.brainRun.execution ?? null,
       };
     }),
   getDeliberation: protectedProcedure
@@ -1420,6 +1425,103 @@ const executionRouter = router({
   deleteCampaign: protectedProcedure
     .input(z.object({ companyId: z.number(), campaignId: z.number() }))
     .mutation(({ input }) => deleteCampaign(input.companyId, input.campaignId)),
+
+  // ── Decision Ledger: retrieve run snapshots ────────────────────────────────
+  getRun: protectedProcedure
+    .input(z.object({
+      companyId: z.number(),
+      taskId:    z.string(),
+    }))
+    .query(async ({ input }) => {
+      const row = await getLatestBrainRun(input.companyId, input.taskId);
+      return { row };
+    }),
+
+  getRunHistory: protectedProcedure
+    .input(z.object({
+      companyId:  z.number(),
+      proposalId: z.number().optional(),
+      limit:      z.number().min(1).max(100).optional(),
+    }))
+    .query(async ({ input }) => {
+      const rows = await getBrainRunHistory({
+        companyId:  input.companyId,
+        proposalId: input.proposalId,
+        limit:      input.limit,
+      });
+      return { rows };
+    }),
+
+  // ── Control-Plane: execute an AI decision after human approval ─────────────
+  executeApproved: protectedProcedure
+    .input(
+      z.object({
+        decision: z.object({
+          companyId:              z.number(),
+          proposalId:             z.number().optional(),
+          taskId:                 z.string(),
+          status:                 z.enum(["pending_approval","approved","rejected","needs_revision"]),
+          recommendation:         z.string(),
+          reason:                 z.string(),
+          confidence:             z.number(),
+          riskScore:              z.number(),
+          requiresHumanApproval:  z.boolean(),
+          executionAllowed:       z.boolean(),
+          selectedAgents:         z.array(z.string()),
+          dissentSummary:         z.array(z.string()),
+          evidence:               z.array(z.any()),
+          createdAt:              z.string(),
+        }),
+        request: z.object({
+          companyId:  z.number(),
+          proposalId: z.number().optional(),
+          taskId:     z.string(),
+          decision:   z.any(),
+          mode:       z.enum(["internal","external"]),
+          target:     z.string(),
+          payload:    z.record(z.string(), z.unknown()),
+        }),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const gate = validateExecutionGate(input.decision as any, input.request as any);
+
+      if (!gate.allowed) {
+        return {
+          status:  "blocked" as const,
+          reason:  gate.reason,
+          receipt: null,
+        };
+      }
+
+      const { receipt, memoryWrite } =
+        await runExecutionWithReceipt(input.request as any);
+
+      // Persist to execution_logs
+      await persistExecutionReceipt({
+        companyId:  input.decision.companyId,
+        proposalId: input.decision.proposalId,
+        taskId:     input.decision.taskId,
+        decision:   input.decision as any,
+        request:    input.request as any,
+        receipt,
+      });
+
+      await createAuditLog({
+        companyId:  input.decision.companyId,
+        entityType: "execution",
+        entityId:   input.decision.proposalId ?? 0,
+        action:     "executed_approved",
+        actor:      ctx.user?.name ?? "system",
+        summary:    `Execution ${receipt.status} for task=${input.decision.taskId}, target=${input.request.target}`,
+      });
+
+      return {
+        status:  receipt.status as string,
+        receipt,
+        memoryWrite,
+      };
+    }),
 });
 
 // ─── Settings Router ──────────────────────────────────────────────────────────
@@ -2142,6 +2244,7 @@ export const appRouter = router({
   decisions: decisionRouter,
   learning: learningRouter,
   commandCenter: commandCenterRouter,
+  brainApproval: approvalRouter,
 });
 
 export type AppRouter = typeof appRouter;

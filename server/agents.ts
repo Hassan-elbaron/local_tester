@@ -213,9 +213,17 @@ export interface AgentOpinionResult {
   opinionAr: string;
   recommendation: string;
   confidence: number;
+  /** Risk score 0-1 from structured agent output (0 = no risk, 1 = max risk) */
+  risk?: number;
   concerns: string[];
   suggestions: string[];
   votedFor: boolean;
+  /** Model routing audit — set by orchestrator when invokeRoutedLLM is used */
+  routing?: {
+    provider: "local" | "cloud";
+    reasons: string[];
+    policyVersion: string;
+  };
 }
 
 export async function generateAgentOpinion(

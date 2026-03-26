@@ -66,6 +66,12 @@ export type InvokeParams = {
   output_schema?: OutputSchema;
   responseFormat?: ResponseFormat;
   response_format?: ResponseFormat;
+  /** Sampling temperature (0-2). Lower = more deterministic. Default: model default. */
+  temperature?: number;
+  /** Routing hint from model_router — "local" | "cloud". Ignored by invokeLLM itself
+   *  (which always calls cloud), but preserved so callers can pass it through
+   *  without TypeScript errors. The real routing decision lives in model_router.ts. */
+  provider?: "local" | "cloud";
 };
 
 export type ToolCall = {
@@ -291,12 +297,17 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     output_schema,
     responseFormat,
     response_format,
+    temperature,
   } = params;
 
   const payload: Record<string, unknown> = {
     model: resolveModel(),
     messages: messages.map(normalizeMessage),
   };
+
+  if (typeof temperature === "number") {
+    payload.temperature = Math.max(0, Math.min(2, temperature));
+  }
 
   if (tools && tools.length > 0) {
     payload.tools = tools;

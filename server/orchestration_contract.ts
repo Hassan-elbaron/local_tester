@@ -117,11 +117,17 @@ export interface BrainDecision {
 // ─── Execution Receipt ────────────────────────────────────────────────────────
 export interface ExecutionReceipt {
   executor: string;
-  status: "planned" | "running" | "completed" | "failed";
+  status: "planned" | "running" | "completed" | "failed" | "blocked";
   externalRef?: string;
   summary: string;
   payload?: unknown;
   executedAt?: string;
+}
+
+// ─── Execution Gate Result ────────────────────────────────────────────────────
+export interface ExecutionGateResult {
+  allowed: boolean;
+  reason: string;
 }
 
 // ─── Execution Request ────────────────────────────────────────────────────────
@@ -149,6 +155,34 @@ export interface MemoryWriteRequest {
   value: unknown;
   confidence?: number;
   source: string;
+}
+
+// ─── Autonomy Levels ──────────────────────────────────────────────────────────
+// L1: insight / read-only analysis only
+// L2: recommendation — no execution, no approval gate
+// L3: recommendation + requires human approval before execution
+// L4: auto-execution allowed for low-risk tasks (confidence ≥ threshold)
+// L5: full autonomy — system executes without any human gate
+export type AutonomyLevel = "L1" | "L2" | "L3" | "L4" | "L5";
+
+export interface AutonomyPolicyDecision {
+  level: AutonomyLevel;
+  executionAllowed: boolean;
+  requiresHumanApproval: boolean;
+  reasoning: string;
+}
+
+// ─── Human Approval Record ────────────────────────────────────────────────────
+// Produced whenever a human explicitly approves or rejects a pending decision.
+// Persisted to execution_logs for a complete audit trail.
+export interface BrainApproval {
+  taskId: string;
+  companyId: number;
+  proposalId?: number;
+  approved: boolean;
+  approvedBy: string;
+  note?: string;
+  createdAt: string;
 }
 
 // ─── Full Run Result ──────────────────────────────────────────────────────────

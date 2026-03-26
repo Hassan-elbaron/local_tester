@@ -1012,6 +1012,41 @@ export const skillsRegistry = mysqlTable("skills_registry", {
 });
 export type SkillRegistryItem = typeof skillsRegistry.$inferSelect;
 
+// ─── Brain Memory (Hybrid Retrieval Store) ───────────────────────────────────
+// Separate from companyMemory (brand/audience/guidelines).
+// Stores orchestration-layer memories: decisions, learnings, execution receipts,
+// agent interactions, research summaries — queryable by scope + confidence.
+export const brainMemory = mysqlTable("brain_memory", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  scope: mysqlEnum("scope", [
+    "company", "decision", "learning", "research", "execution", "agent_interaction"
+  ]).notNull(),
+  key: varchar("key", { length: 255 }).notNull(),
+  value: json("value").notNull(),
+  confidence: float("confidence").default(0.5).notNull(),
+  source: varchar("source", { length: 100 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type BrainMemoryRecord = typeof brainMemory.$inferSelect;
+
+// ─── Execution Logs (Receipt Store) ──────────────────────────────────────────
+export const executionLogs = mysqlTable("execution_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  proposalId: int("proposalId"),
+  taskId: varchar("taskId", { length: 255 }).notNull(),
+  actionType: varchar("actionType", { length: 100 }).notNull(),
+  status: mysqlEnum("status", ["planned", "running", "completed", "failed", "blocked"]).notNull(),
+  executor: varchar("executor", { length: 100 }).notNull(),
+  externalRef: varchar("externalRef", { length: 255 }),
+  summary: text("summary").notNull(),
+  payload: json("payload").$type<Record<string, unknown>>().notNull(),
+  executedAt: timestamp("executedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type ExecutionLog = typeof executionLogs.$inferSelect;
+
 // ─── Deliberation Sessions ────────────────────────────────────────────────────
 export const deliberationSessions = mysqlTable("deliberation_sessions", {
   id: int("id").autoincrement().primaryKey(),
