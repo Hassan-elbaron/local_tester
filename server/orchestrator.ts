@@ -790,10 +790,16 @@ export async function runOrchestratedDeliberation(params: {
 
   const gate = validateExecutionGate(brainDecision, executionRequest);
 
+  // ── DEMO_MODE execution bypass ───────────────────────────────────────────
+  // When DEMO_MODE=true, the gate is bypassed so the demo can run end-to-end
+  // without human approval steps. Autonomy policy itself is unchanged —
+  // this is the ONLY place demo execution override is applied.
+  const demoBypass = process.env.DEMO_MODE === "true";
+
   let execution: ExecutionReceipt | undefined;
   let executionMemoryWrite: MemoryWriteRequest | undefined;
 
-  if (!gate.allowed) {
+  if (!gate.allowed && !demoBypass) {
     execution = {
       executor: "execution_gate",
       status: "blocked",

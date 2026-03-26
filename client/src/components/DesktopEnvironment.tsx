@@ -19,7 +19,7 @@ import {
   Settings, Activity, Clock, Info, CheckSquare, MessageSquare,
   Send, Loader2, Target, TrendingUp, Eye, BookOpen,
   Cpu, AlertTriangle, Map, Users, Radar, Lightbulb,
-  SlidersHorizontal, Grid3x3, Minimize2, Maximize2, FlaskConical,
+  SlidersHorizontal, Grid3x3, Minimize2, Maximize2, FlaskConical, FileBarChart2,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { getLoginUrl } from "@/const";
@@ -36,6 +36,7 @@ interface AppDef {
 
 const APP_DEFS: AppDef[] = [
   // ── Core ──
+  { id: "overview",   labelKey: "nav.overview",   icon: <FileBarChart2 className="w-5 h-5" />,   path: "/overview",  color: "from-slate-500 to-slate-600",    group: "core" },
   { id: "demo",       labelKey: "nav.demo",       icon: <FlaskConical className="w-5 h-5" />,    path: "/demo",      color: "from-violet-500 to-pink-500",    group: "core" },
   { id: "dashboard",  labelKey: "nav.dashboard",  icon: <LayoutDashboard className="w-5 h-5" />, path: "/",          color: "from-indigo-500 to-indigo-600",  group: "core" },
   { id: "pipeline",   labelKey: "nav.pipeline",   icon: <Map className="w-5 h-5" />,             path: "/pipeline",  color: "from-orange-500 to-orange-600",  group: "core" },
