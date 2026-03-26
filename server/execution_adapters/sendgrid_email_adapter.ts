@@ -47,6 +47,9 @@ export class SendGridEmailExecutionAdapter implements ExecutionAdapter {
   }
 
   async execute(req: BrainExecutionRequest): Promise<ExternalExecutionResult> {
+    if (process.env.DEMO_MODE === "true") {
+      return { ok: true, externalRef: "demo_email_456", summary: "Demo: Email sent (simulated)", payload: { status: 202 } };
+    }
     // ── Payload validation ────────────────────────────────────────────────
     if (!isSendGridEmailPayload(req.payload)) {
       return {

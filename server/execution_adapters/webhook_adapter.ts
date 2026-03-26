@@ -43,6 +43,9 @@ export class WebhookExecutionAdapter implements ExecutionAdapter {
   }
 
   async execute(req: BrainExecutionRequest): Promise<ExternalExecutionResult> {
+    if (process.env.DEMO_MODE === "true") {
+      return { ok: true, externalRef: "demo_webhook_000", summary: "Demo: Webhook executed (simulated)", payload: { target: req.target } };
+    }
     const url     = process.env.EXECUTION_WEBHOOK_URL;
     const secret  = process.env.EXECUTION_WEBHOOK_SECRET;
     const timeout = Number(process.env.EXECUTION_WEBHOOK_TIMEOUT_MS ?? DEFAULT_TIMEOUT_MS);

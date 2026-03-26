@@ -48,6 +48,9 @@ export class CrmExecutionAdapter implements ExecutionAdapter {
   }
 
   async execute(req: BrainExecutionRequest): Promise<ExternalExecutionResult> {
+    if (process.env.DEMO_MODE === "true") {
+      return { ok: true, externalRef: "demo_crm_lead_789", summary: "Demo: CRM lead created (simulated)", payload: { action: req.payload.action } };
+    }
     // ── Payload validation ────────────────────────────────────────────────
     if (!isCrmPayload(req.payload)) {
       return {

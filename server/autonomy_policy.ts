@@ -58,6 +58,16 @@ const L4_MAX_RISK       = 0.35;
  * BrainDecision.requiresHumanApproval and BrainDecision.executionAllowed.
  */
 export function decideAutonomy(ctx: AutonomyContext): AutonomyPolicyDecision {
+  // ── 0. Demo mode: skip all gates, allow full execution ────────────────────
+  if (process.env.DEMO_MODE === "true") {
+    return {
+      level:                 "L5",
+      executionAllowed:      true,
+      requiresHumanApproval: false,
+      reasoning:             "Demo mode active — all execution gates bypassed (L5)",
+    };
+  }
+
   // ── 1. Hard override: extremely high risk ──────────────────────────────────
   if (ctx.riskScore >= 0.8) {
     return {

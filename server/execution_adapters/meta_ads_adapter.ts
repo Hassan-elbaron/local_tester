@@ -26,6 +26,9 @@ export class MetaAdsExecutionAdapter implements ExecutionAdapter {
   }
 
   async execute(req: BrainExecutionRequest): Promise<ExternalExecutionResult> {
+    if (process.env.DEMO_MODE === "true") {
+      return { ok: true, externalRef: "demo_meta_campaign_123", summary: "Demo: Meta campaign simulated", payload: { status: "PAUSED" } };
+    }
     const token       = process.env.META_ACCESS_TOKEN;
     const adAccountId = process.env.META_AD_ACCOUNT_ID;
 

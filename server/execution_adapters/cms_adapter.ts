@@ -47,6 +47,9 @@ export class CmsExecutionAdapter implements ExecutionAdapter {
   }
 
   async execute(req: BrainExecutionRequest): Promise<ExternalExecutionResult> {
+    if (process.env.DEMO_MODE === "true") {
+      return { ok: true, externalRef: "demo_cms_post_321", summary: "Demo: CMS draft created (simulated)", payload: { action: req.payload.action } };
+    }
     // ── Payload validation ────────────────────────────────────────────────
     if (!isCmsPayload(req.payload)) {
       return {
