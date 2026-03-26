@@ -298,7 +298,13 @@ const proposalsRouter = router({
         messageAr: result.summaryAr,
         entityType: "approval", entityId: approval!.id,
       });
-      return { deliberationId: result.deliberationId, approval, escalated: result.escalated, decisionTrace: result.decisionTrace };
+      return {
+        deliberationId: result.deliberationId,
+        approval,
+        escalated: result.escalated,
+        decisionTrace: result.decisionTrace,
+        brainRun: result.brainRun,
+      };
     }),
   getDeliberation: protectedProcedure
     .input(z.object({ proposalId: z.number(), companyId: z.number() }))

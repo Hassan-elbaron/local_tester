@@ -13,6 +13,14 @@ import { AGENTS, AgentConfig, AgentOpinionResult } from "./agents";
 import { getCompanyMemory, createDeliberation, saveAgentOpinion, updateDeliberation } from "./db";
 import { buildIntelligenceContext } from "./intelligence";
 import { buildCompanyContext } from "./knowledge";
+import {
+  BrainTask,
+  BrainDecision,
+  BrainEvidence,
+  BrainRunResult,
+  DeliberationBundle,
+  MemoryWriteRequest,
+} from "./orchestration_contract";
 
 // ─── Agent Domain Weights ─────────────────────────────────────────────────────
 // Weight 0-1: how relevant this agent is per proposal type
@@ -59,6 +67,7 @@ export interface OrchestratedDeliberationResult {
   escalationReason?: string;
   summary: string;
   summaryAr: string;
+  brainRun: BrainRunResult;
 }
 
 export interface DecisionTrace {
@@ -133,6 +142,45 @@ async function getOpinion(
   }
 }
 
+// ─── Orchestration Contract Helpers ──────────────────────────────────────────
+function nowIso(): string {
+  return new Date().toISOString();
+}
+
+function makeTask(params: {
+  companyId: number;
+  proposalId: number;
+  proposalType: string;
+  proposalContext: string;
+}): BrainTask {
+  return {
+    id: `task_${params.companyId}_${params.proposalId}_${Date.now()}`,
+    companyId: params.companyId,
+    proposalId: params.proposalId,
+    type: (params.proposalType as BrainTask["type"]) ?? "strategy",
+    action: "recommend",
+    title: `Proposal ${params.proposalId} deliberation`,
+    description: params.proposalContext,
+    input: {
+      proposalType: params.proposalType,
+      proposalContext: params.proposalContext,
+    },
+    stage: "deliberation",
+    createdAt: nowIso(),
+  };
+}
+
+function buildEvidence(companyContext: string): BrainEvidence[] {
+  return [
+    {
+      source: "db",
+      key: "company_context",
+      summary: "Merged company knowledge + intelligence context used in deliberation",
+      payload: companyContext,
+    },
+  ];
+}
+
 // ─── Main Orchestrated Deliberation ──────────────────────────────────────────
 export async function runOrchestratedDeliberation(params: {
   proposalId: number;
@@ -149,6 +197,10 @@ export async function runOrchestratedDeliberation(params: {
     buildCompanyContext(companyId),
   ]);
   const companyContext = `${knowledgeCtx}\n\n${intelligenceCtx}`;
+
+  // 1b. Build orchestration task envelope + evidence
+  const task = makeTask({ companyId, proposalId, proposalType, proposalContext });
+  const evidence = buildEvidence(companyContext);
 
   // 2. Select agents contextually
   const selected = selectAgents(proposalType, budget);
@@ -281,6 +333,90 @@ export async function runOrchestratedDeliberation(params: {
     },
   };
 
+  // ─── Build canonical BrainRunResult ────────────────────────────────────────
+  const averageRisk =
+    lastRound.length > 0
+      ? lastRound.reduce((sum, op) => {
+          const localRisk = Math.max(0, 1 - op.confidence) + (op.dissent ? 0.25 : 0);
+          return sum + Math.min(1, localRisk);
+        }, 0) / lastRound.length
+      : 0.5;
+
+  const deliberationBundle: DeliberationBundle = {
+    task,
+    round: "final",
+    assessments: lastRound.map(op => ({
+      agentId: op.agentRole,
+      agentRole: op.agentRole,
+      opinion: op.opinion,
+      recommendation: op.recommendation,
+      confidence: op.confidence,
+      riskScore: Math.min(1, Math.max(0, 1 - op.confidence)),
+      votedFor: op.votedFor,
+      concerns: op.concerns,
+      suggestions: op.suggestions,
+      evidence: [],
+    })),
+    weightedConsensus: weightedConsensusScore,
+    averageConfidence: avgConfidence,
+    averageRisk,
+    dissentCount: dissenters.length,
+  };
+
+  const brainDecision: BrainDecision = {
+    companyId,
+    proposalId,
+    taskId: task.id,
+    status: escalated ? "needs_revision" : "pending_approval",
+    recommendation: finalRecommendation,
+    reason: summary,
+    confidence: avgConfidence,
+    riskScore: averageRisk,
+    requiresHumanApproval: true,
+    executionAllowed: false,
+    selectedAgents: selected.map(s => s.agent.role),
+    dissentSummary: dissentSummary.map(d => `${d.agentName}: ${d.concern}`),
+    evidence,
+    createdAt: nowIso(),
+  };
+
+  const memoryWrites: MemoryWriteRequest[] = [
+    {
+      companyId,
+      scope: "decision",
+      key: `proposal_${proposalId}_decision_preview`,
+      value: {
+        taskId: task.id,
+        recommendation: finalRecommendation,
+        consensus: weightedConsensusScore,
+        avgConfidence,
+        averageRisk,
+        escalated,
+      },
+      confidence: avgConfidence,
+      source: "orchestrator",
+    },
+    {
+      companyId,
+      scope: "agent_interaction",
+      key: `proposal_${proposalId}_deliberation_summary`,
+      value: {
+        selectedAgents: selected.map(s => s.agent.role),
+        dissentCount: dissenters.length,
+        rounds: allRounds.length,
+      },
+      confidence: weightedConsensusScore,
+      source: "orchestrator",
+    },
+  ];
+
+  const brainRun: BrainRunResult = {
+    task,
+    deliberation: deliberationBundle,
+    decision: brainDecision,
+    memoryWrites,
+  };
+
   return {
     proposalId, companyId,
     deliberationId: deliberation.id,
@@ -295,5 +431,6 @@ export async function runOrchestratedDeliberation(params: {
     escalationReason: escalated ? `Low confidence (${(avgConfidence * 100).toFixed(0)}%) or high dissent from key agents` : undefined,
     summary,
     summaryAr,
+    brainRun,
   };
 }
